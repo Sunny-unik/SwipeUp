@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import AOS from "aos";
 import Picker from 'emoji-picker-react';
 import Loading from "./Loading";
+import { updateUser } from "../actions/userAction";
 
 export default function ChatPage(props) {
   const user = useSelector((state) => state.user);
@@ -82,9 +83,9 @@ export default function ChatPage(props) {
   }
 
   function updateDetails() {
-    var updateUserDetails = { userId, uname, uemail };
-    axios
-      .post(`${process.env.REACT_APP_API_URL}/update-user`, updateUserDetails)
+    let updateUserDetails = { userId, uname, uemail };
+    // updateUser(updateUserDetails)
+    axios.post(`${process.env.REACT_APP_API_URL}/update-user`, updateUserDetails)
       .then((res) => {
         alert(res.data.data);
       })
@@ -281,12 +282,12 @@ export default function ChatPage(props) {
   const [sortedMergeMessages, setsortedMergeMessages] = useState([]);
   const [messageList, setmessageList] = useState([]);
   const [messageList2, setmessageList2] = useState([]);
-  const [refreshId, setrefreshId] = useState();
+  // const [refreshId, setrefreshId] = useState();
 
   function openChat(fData) {
     setmessage("");
     // console.log(refreshId);
-    clearInterval(refreshId);
+    // clearInterval(refreshId);
     axios.post(`${process.env.REACT_APP_API_URL}/friendData/?id=` + fData).then((res) => {
       if (res.data.status == "ok") {
         setfname(res.data.data);
@@ -298,36 +299,36 @@ export default function ChatPage(props) {
       }
     });
 
-    setrefreshId(
-      setInterval(() => {
-        // show friend msg
-        axios.post(`${process.env.REACT_APP_API_URL}/messages2`, { fData }).then((res) => {
-          if (res.data.status == "ok") {
-            var chat2 = res.data.data.filter(function (s) {
-              var friend2 = s.friendUsername === myUsername.userUserName;
-              return friend2;
-            });
-            // console.log(chat2);
-            setmessageList2(chat2);
-          } else {
-            setmessageList2([]);
-          }
+    // setrefreshId(
+    //   setInterval(() => {
+    // show friend msg
+    axios.post(`${process.env.REACT_APP_API_URL}/messages2`, { fData }).then((res) => {
+      if (res.data.status == "ok") {
+        var chat2 = res.data.data.filter(function (s) {
+          var friend2 = s.friendUsername === myUsername.userUserName;
+          return friend2;
         });
+        // console.log(chat2);
+        setmessageList2(chat2);
+      } else {
+        setmessageList2([]);
+      }
+    });
 
-        // Show My Messages
-        axios.post(`${process.env.REACT_APP_API_URL}/messages1`, myUsername).then((res) => {
-          if (res.data.status == "ok") {
-            var chat = res.data.data.filter(function (s) {
-              var friend = s.friendUsername === fData;
-              return friend;
-            });
-            setmessageList(chat);
-          } else {
-            setmessageList([]);
-          }
+    // Show My Messages
+    axios.post(`${process.env.REACT_APP_API_URL}/messages1`, myUsername).then((res) => {
+      if (res.data.status == "ok") {
+        var chat = res.data.data.filter(function (s) {
+          var friend = s.friendUsername === fData;
+          return friend;
         });
-      }, 300)
-    );
+        setmessageList(chat);
+      } else {
+        setmessageList([]);
+      }
+    });
+    //   }, 300)
+    // );
   }
 
   useEffect(() => {
@@ -376,7 +377,7 @@ export default function ChatPage(props) {
   // delete a message
   function deleteMsg(id) {
     axios.post(`${process.env.REACT_APP_API_URL}/delete-a-message`, { id }).then((res) => {
-      alert(res.data.data);
+      // alert(res.data.data);
     });
   }
 
@@ -385,7 +386,7 @@ export default function ChatPage(props) {
     axios
       .post(`${process.env.REACT_APP_API_URL}/delete-all-message`, { mine, frnd })
       .then((res) => {
-        alert(res.data.data);
+        // alert(res.data.data);
       });
   }
 
@@ -435,9 +436,7 @@ export default function ChatPage(props) {
         e.target.classList.add('active')
         document.querySelector('.startScreen').classList.add("d-none")
         document.querySelector('div.chat').classList.remove("d-none")
-        setTimeout(() => {
-          document.querySelector("div.chat-history > ul").scrollTop = document.querySelector("div.chat-history > ul").scrollHeight
-        }, 600);
+        document.querySelector("div.chat-history > ul") && (document.querySelector("div.chat-history > ul").scrollTop = document.querySelector("div.chat-history > ul").scrollHeight)
       })
     })
   }
@@ -481,8 +480,8 @@ export default function ChatPage(props) {
                       <img className="avatar-xl" alt="avatar" style={{ height: "140px", width: '140px' }}
                         src={userImage ? `${process.env.REACT_APP_API_URL + '/' + userImage}` : 'defaultProfile.jpg'} />
                     </div>
-                    <h2 className="text-center text-dark">Sunny Gandhwani</h2>
-                    <h5 className="text-center text-dark">sunny</h5>
+                    <h2 className="text-center text-dark">{userName}</h2>
+                    <h5 className="text-center text-dark">{userUserName}</h5>
                   </div>
                   <h2 className="w-100 text-secondary text-right"><u> -Settings</u></h2>
                   <details className="text-primary" style={{ marginTop: "2rem", fontSize: "1.2rem", fontWeight: "bold" }}>
@@ -492,31 +491,30 @@ export default function ChatPage(props) {
                         <img className="avatar-xl mt-2" height='55px' width='55px' alt="image"
                           src={userImage ? `${process.env.REACT_APP_API_URL + '/' + userImage}` : 'defaultProfile.jpg'} />
                         <div className="column">
-                          <input type="file" accept="image/png,image/jpg,image/jpeg" className="rounded btn btn-light w-75 ml-1" style={{ overflow: "hidden" }} />
-                          {/* <label> */}
+                          <input type="file" accept="image/png,image/jpg,image/jpeg" className="rounded btn btn-light w-75 ml-1"
+                            style={{ overflow: "hidden" }} />
                           {/* <span className="btn btn-primary w-50 m-1 bg-primary" >Upload</span> */}
                           <div className="text-center">
-                            <button type="button" className="btn bg-success btn-success w-50 ">Set</button>
+                            <button type="button" onClick={updateProfile} className="btn bg-success btn-success w-50 ">Set</button>
                           </div>
                         </div>
-                        {/* </label> */}
                         <small className="text-secondary">For best results, use an image at least 256px by 256px in either .jpg or .png format!</small>
                       </div>
                       <div className="parent">
                         <div className="field">
                           <label htmlFor="Name">Name </label>
-                          <input type="text" name="Uname" className="form-control" id="Name" placeholder="Name" required defaultValue="Sunny Gandhwani" />
+                          <input type="text" className="form-control" placeholder="Name" name="Uname" value={uname} onChange={(e) => { setValue(e) }} required />
                         </div>
                         <div className="field">
                           <label htmlFor="username">username</label>
-                          <input type="text" name="Uusername" className="form-control" id="username" placeholder="username" disabled defaultValue="sunny" />
+                          <input type="text" name="Uusername" className="form-control" id="username" placeholder="username" disabled value={uusername} onChange={(e) => { setValue(e) }} />
                         </div>
                       </div>
                       <div className="field">
                         <label htmlFor="email">Email </label>
-                        <input type="email" name="Uemail" className="form-control" id="email" placeholder="Enter your email address" required defaultValue="k18419@cpur.edu.in" />
+                        <input type="email" name="Uemail" className="form-control" id="email" placeholder="Enter your email address" required value={uemail} onChange={(e) => { setValue(e) }} />
                       </div>
-                      <button type="button" className="btn button w-100 mt-2">Apply Changes</button>
+                      <button type="button" className="btn button w-100 mt-2" onClick={updateDetails} >Apply Changes</button>
                     </form>
                   </details>
                   <details className="text-primary" style={{ marginTop: "2rem", fontSize: "1.2rem", fontWeight: "bold" }}>
@@ -524,17 +522,17 @@ export default function ChatPage(props) {
                     <form>
                       <div className="field">
                         <label htmlFor="password">Old Password</label>
-                        <input type="password" name="oldpassword" className="form-control" id="password" placeholder="Enter a new password" required defaultValue />
+                        <input type="password" name="oldpassword" className="form-control" id="password" placeholder="Enter a new password" required value={oldpassword} onChange={(e) => { setValue(e) }} />
                       </div>
                       <div className="field">
                         <label htmlFor="password">New Password</label>
-                        <input type="password" name="newpassword" className="form-control" id="password" placeholder="Enter a new password" required defaultValue />
+                        <input type="password" name="newpassword" className="form-control" id="password" placeholder="Enter a new password" required value={newpassword} onChange={(e) => { setValue(e) }} />
                       </div>
                       <div className="field">
                         <label htmlFor="password">Re-enter New Password</label>
-                        <input type="password" name="re-enter-new-password" className="form-control" id="password" placeholder="Enter a new password" required defaultValue />
+                        <input type="password" name="re-enter-new-password" className="form-control" id="password" placeholder="Enter a new password" required value={reenternewpassword} onChange={(e) => { setValue(e) }} />
                       </div>
-                      <button type="button" className="btn button w-100 mt-2">Change Password</button>
+                      <button type="button" className="btn button w-100 mt-2" onClick={changePassword}>Change Password</button>
                     </form>
                   </details>
                 </div>
@@ -543,11 +541,8 @@ export default function ChatPage(props) {
                 <div className="search">
                   <div class="input-group">
                     <div class="input-group-prepend">
-                      <input type="search" className="form-control" id="notice" placeholder="Enter Username to add friends..." />
-                      {/* <span class="input-group-text btn btn-link loop"><i class="fa fa-user-plus"></i></span> */}
-                      <button className="btn create" data-toggle="modal" data-target="#exampleModalCenter">
-                        <i className="fa fa-user-plus"></i>
-                      </button>
+                      <input name="friend" value={friend} onChange={(e) => { setValue(e); }} type="text" className="form-control" required id="user notice" placeholder="Username to add friends..." />
+                      <button className="btn rounded bg-light create" type="button" onClick={addFriend}><i className="fa fa-user-plus"></i></button>
                     </div>
                   </div>
                 </div>

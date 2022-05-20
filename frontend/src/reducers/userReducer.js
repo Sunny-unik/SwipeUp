@@ -1,11 +1,11 @@
-export function user (state=null,action){
-    switch(action.type)
-    {
+export function user(state = null, action) {
+    console.log(action);
+    switch (action.type) {
         case "LOGIN_USER":
-                return action.payload;
+            return action.payload;
         case "LOGOUT_USER":
-           return null;
-        default:               
-           return state;
+            return null;
+        default:
+            return state;
     }
 }

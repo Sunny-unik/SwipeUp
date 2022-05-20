@@ -61,8 +61,8 @@ app.post('/create-account', bodyParser.json(), (req, res) => {
     userCollection.insert(req.body, (err, result) => {
         if (!err) {
             res.send({ status: "OK", data: "Account Created successfully. You can login now. You are redirected to login page." })
-            sendMail("stackinflow1@gmail.com", "app_password"                    # replace with the empty string, req.body.uemail, 
-            "Welcome to SwipUp", `<b> Registration successfully </b>   `)
+            sendMail("stackinflow1@gmail.com", "app_password"                    # replace with the empty string, req.body.uemail,
+                "Welcome to SwipUp", `<b> Registration successfully </b>   `)
         } else {
             res.send({ status: "Failed", data: err })
         }
@@ -93,14 +93,14 @@ app.post('/valid-username', bodyParser.json(), (req, res) => {
 
 app.post("/send-user-otp", bodyParser.json(), (req, res) => {
     console.log(req.body.otp);
-    sendMail("stackinflow1@gmail.com", "app_password"                    # replace with the empty string, req.body.uemail, 
-    "Welcome to SwipUp", `Your One Time Password is - <h3>${req.body.otp}</h3><br><h6>We hope you find our service cool.</h6>`)
+    sendMail("stackinflow1@gmail.com", "app_password"                    # replace with the empty string, req.body.uemail,
+        "Welcome to SwipUp", `Your One Time Password is - <h3>${req.body.otp}</h3><br><h6>We hope you find our service cool.</h6>`)
     res.send({ status: "ok", data: "please verify your email" });
 })
 
 app.post('/check-login', bodyParser.json(), (req, res) => {
     var usercollection = connection.db('SwipeUp').collection('Users');
-    usercollection.find({ $or: [ { uemail:req.body.email }, { uusername:req.body.email } ], upassword: req.body.password }).toArray((err, result) => {
+    usercollection.find({ $or: [{ uemail: req.body.email }, { uusername: req.body.email }], upassword: req.body.password }).toArray((err, result) => {
         if (!err && result.length > 0) {
             res.send({ status: 'ok', data: result[0] });
         } else {
@@ -138,7 +138,7 @@ app.post('/update-user', bodyParser.json(), (req, res) => {
 
 app.post('/update-password', bodyParser.json(), (req, res) => {
     var userCollection = connection.db('SwipeUp').collection('Users')
-    userCollection.updateOne({ $or: [ { uemail:req.body.email }, { uusername:req.body.email } ] }, { $set: { upassword: req.body.newpassword } }, (err, result) => {
+    userCollection.updateOne({ $or: [{ uemail: req.body.email }, { uusername: req.body.email }] }, { $set: { upassword: req.body.newpassword } }, (err, result) => {
         if (!err) {
             res.send({ status: "success", data: "Password updated sucessfully" });
         } else {
@@ -185,13 +185,13 @@ app.post('/add-friend', bodyParser.json(), (req, res) => {
 
 app.post("/send-otp-email", bodyParser.json(), (req, res) => {
     var usercollection = connection.db('SwipeUp').collection('Users');
-    usercollection.find({ $or: [ { uemail:req.body.email }, { uusername:req.body.email } ] }).toArray((err, result) => {
+    usercollection.find({ $or: [{ uemail: req.body.email }, { uusername: req.body.email }] }).toArray((err, result) => {
         if (!err && result.length > 0) {
             console.log(req.body.otp);
-            sendMail("stackinflow1@gmail.com", "app_password"                    # replace with the empty string, result[0].uemail, "Welcome to SwipeUp", 
-            `Your One Time Password is - <h3>${req.body.otp}</h3><br><h6>We hope you find our service cool.</h6>`)
+            sendMail("stackinflow1@gmail.com", "app_password"                    # replace with the empty string, result[0].uemail, "Welcome to SwipeUp",
+                `Your One Time Password is - <h3>${req.body.otp}</h3><br><h6>We hope you find our service cool.</h6>`)
             res.send({ status: "ok", data: "please enter correct otp" });
-        } 
+        }
         else {
             res.send({ status: 'error', data: err })
         }
@@ -237,8 +237,8 @@ app.post('/accept-request', bodyParser.json(), (req, res) => {
     const collection = connection.db('SwipeUp').collection('Users');
     var friend = req.body.friendReq;
     var username = req.body.userUserName;
-collection.updateOne({ "uusername": username, "friends": { $elemMatch: { "name": friend } } }, { $set: { "friends.$.status": true } })
-collection.updateOne({ "uusername": friend, "friends": { $elemMatch: { "name": username } } }, { $set: { "friends.$.status": true } }
+    collection.updateOne({ "uusername": username, "friends": { $elemMatch: { "name": friend } } }, { $set: { "friends.$.status": true } })
+    collection.updateOne({ "uusername": friend, "friends": { $elemMatch: { "name": username } } }, { $set: { "friends.$.status": true } }
         , (err, result) => {
             if (!err) {
                 res.send({ status: "ok", data: "friend request accepted" });
@@ -287,7 +287,7 @@ app.post('/friendData', bodyParser.json(), (req, res) => {
 });
 
 app.post('/send-message', bodyParser.json(), (req, res) => {
-    const collection = connection.db('SwipeUp').collection('messages');
+    const collection = connection.db('SwipeUp').collection('Messages');
     collection.insertOne(req.body, (err, result) => {
         if (!err) {
             res.send({ status: "ok", data: "Message Sent" });
@@ -298,9 +298,9 @@ app.post('/send-message', bodyParser.json(), (req, res) => {
     })
 });
 
-// for retrieving messages
+// for retrieving Messages
 app.post('/messages1', bodyParser.json(), (req, res) => {
-    const collection = connection.db('SwipeUp').collection('messages');
+    const collection = connection.db('SwipeUp').collection('Messages');
     collection.find({ userUserName: (req.body.userUserName) }).toArray((err, docs) => {
         if (!err) {
             res.send({ status: "ok", data: docs });
@@ -313,7 +313,7 @@ app.post('/messages1', bodyParser.json(), (req, res) => {
 
 // for retrieving messages
 app.post('/messages2', bodyParser.json(), (req, res) => {
-    const collection2 = connection.db('SwipeUp').collection('messages');
+    const collection2 = connection.db('SwipeUp').collection('Messages');
     collection2.find({ userUserName: (req.body.fData) }).toArray((err, docs) => {
         if (!err) {
             res.send({ status: "ok", data: docs });
@@ -324,9 +324,9 @@ app.post('/messages2', bodyParser.json(), (req, res) => {
     })
 });
 
-// for delete a messages
+// for delete a Messages
 app.post('/delete-a-message', bodyParser.json(), (req, res) => {
-    const collection = connection.db('SwipeUp').collection('messages');
+    const collection = connection.db('SwipeUp').collection('Messages');
     collection.deleteOne({ messageid: (req.body.id) }, (err, result) => {
         if (!err) {
             res.send({ status: "OK", data: "Message Deleted successfully" })
@@ -339,7 +339,7 @@ app.post('/delete-a-message', bodyParser.json(), (req, res) => {
 
 // delete all msg between two persons
 app.post('/delete-all-message', bodyParser.json(), (req, res) => {
-    const collection = connection.db('SwipeUp').collection('messages');
+    const collection = connection.db('SwipeUp').collection('Messages');
     // console.log(req.body);
     collection.deleteMany({ userUserName: (req.body.frnd), friendUsername: (req.body.mine) })
     collection.deleteMany({ userUserName: (req.body.mine), friendUsername: (req.body.frnd) }, (err, result) => {

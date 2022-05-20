@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import AOS from "aos";
+import Picker from 'emoji-picker-react';
 import Loading from "./Loading";
 
 export default function ChatPage(props) {
@@ -12,7 +13,7 @@ export default function ChatPage(props) {
       props.history.push("/");
     }
   });
-  console.log(user);
+  // console.log(user);
   const userId = useSelector((state) => state.user._id);
   const userName = useSelector((state) => state.user.uname);
   const userUserName = useSelector((state) => state.user.uusername);
@@ -292,7 +293,8 @@ export default function ChatPage(props) {
         setchatName(res.data.data[0].uname);
         setchatUsername(res.data.data[0].uusername);
         setchatProfile(res.data.data[0].profile);
-        console.log(chatName, fname, chatUsername, chatProfile);
+        console.log(res.data.data);
+        // console.log(chatName, fname, chatUsername, chatProfile);
       }
     });
 
@@ -320,7 +322,6 @@ export default function ChatPage(props) {
               return friend;
             });
             setmessageList(chat);
-            console.log(chat);
           } else {
             setmessageList([]);
           }
@@ -337,6 +338,7 @@ export default function ChatPage(props) {
       var scnd = new Date(b.dateTime);
       return frst - scnd;
     }
+    // console.log(mergeMessages);
     setsortedMergeMessages(mergeMessages.sort(msgSort));
     // console.log(sortedMergeMessages);
   }, [messageList, messageList2]);
@@ -433,6 +435,9 @@ export default function ChatPage(props) {
         e.target.classList.add('active')
         document.querySelector('.startScreen').classList.add("d-none")
         document.querySelector('div.chat').classList.remove("d-none")
+        setTimeout(() => {
+          document.querySelector("div.chat-history > ul").scrollTop = document.querySelector("div.chat-history > ul").scrollHeight
+        }, 600);
       })
     })
   }
@@ -495,7 +500,7 @@ export default function ChatPage(props) {
                           </div>
                         </div>
                         {/* </label> */}
-                        <p className="text-secondary">For best results, use an image at least 256px by 256px in either .jpg or .png format!</p>
+                        <small className="text-secondary">For best results, use an image at least 256px by 256px in either .jpg or .png format!</small>
                       </div>
                       <div className="parent">
                         <div className="field">
@@ -603,58 +608,56 @@ export default function ChatPage(props) {
               </div>
 
               <div class="chat-history">
-                <ul class="m-b-0">
-                  <li class="clearfix">
-                    <div class="message-data text-right">
-                      <span class="message-data-time">10:10 AM, Today</span>
-                      <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar" />
-                    </div>
-                    <div class="message other-message float-right">
-                      {" "}
-                      Hi Aiden, how are you? How is the project coming along?{" "}
-                    </div>
-                  </li>
-                  <li class="clearfix">
-                    <div class="message-data">
-                      <span class="message-data-time">10:12 AM, Today</span>
-                    </div>
-                    <div class="message my-message">Are we meeting today?</div>
-                  </li>
-                  <li class="clearfix">
-                    <div class="message-data">
-                      <span class="message-data-time">10:15 AM, Today</span>
-                    </div>
-                    <div class="message my-message">
-                      Project has been already finished and I have results to show you.
-                    </div>
-                  </li>
-                  <li class="clearfix">
-                    <div class="message-data">
-                      <span class="message-data-time">10:15 AM, Today</span>
-                    </div>
-                    <div class="message my-message">
-                      Project has been already finished and I have results to show you.
-                    </div>
-                  </li>
-                  <li class="clearfix">
-                    <div class="message-data">
-                      <span class="message-data-time">10:15 AM, Today</span>
-                    </div>
-                    <div class="message my-message">
-                      Project has been already finished and I have results to show you.
-                    </div>
-                  </li>
+                {console.log(sortedMergeMessages)}
+                {sortedMergeMessages.length != 0 && <><ul class="m-b-0">
+                  {(() => {
+                    return sortedMergeMessages.map((s) => {
+                      return <li class="clearfix">
+                        <div className={s.friendUsername == myUsername.userUserName ? "message-data" : "message-data text-right"} style={{ minWidth: '64px' }}>
+                          {/* {console.log(`${process.env.REACT_APP_API_URL + '/' + chatProfile}`)} */}
+                          {s.friendUsername == myUsername.userUserName && <img src={chatProfile ? `${process.env.REACT_APP_API_URL + '/' + chatProfile}` : `defaultProfile.jpg`} alt="avatar" />}
+                          <span class="message-data-time">{s.time}&nbsp;{s.date}</span>
+                        </div>
+                        <div class={s.friendUsername == myUsername.userUserName ? "message other-message" : "message my-message float-right"}>
+                          <div class="dropdown">
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                              <span class="dropdown-item" style={{ cursor: 'pointer' }} onClick={() => { deleteMsg(s.messageid) }}>
+                                <i className="fa fa-trash"></i> delete
+                              </span>
+                            </div>
+                            <span class="dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              {s.message.split('\n').map(str => <p className={s.message.split('\n').length > 1 ? "" : 'd-inline'}>{str}</p>)}
+                            </span>
+                          </div>
+                        </div>
+                      </li>
+                    })
+                  })()}
                 </ul>
+                  <div ref={messagesEndRef}></div>
+                  <div className="picker-container" style={{ position: 'relative', width: '99%', bottom: '13em', left: '0.2em', overflowX: 'hidden' }}>
+                    {showPicker && <Picker pickerStyle={{ width: '100%', height: '30vh' }} onEmojiClick={onEmojiClick} />}
+                  </div>
+                </>}
+                {sortedMergeMessages.length == 0 && <div className="col-md-12">
+                  <div className="no-messages">
+                    {/* <i className="material-icons md-48">forum</i> */}
+                    <p className="text-center">Seems people are shy to start the chat. Break the ice send the first message.</p>
+                  </div>
+                  <div className="picker-container" style={{ position: 'relative', width: '100%' }}>
+                    {showPicker && <Picker pickerStyle={{ width: '100%', height: '30vh' }} onEmojiClick={onEmojiClick} />}
+                  </div>
+                </div>}
               </div>
 
               <div class="chat-message clearfix">
-                <div class="input-group mb-0">
+                <div class="input-group mb-0 bg-light">
                   <div class="input-group-prepend border w-100 rounded">
-                    <div class="input-group-text btn btn-warning">
+                    <div class="input-group-text btn btn-warning emoticons" onClick={() => setShowPicker(val => !val)}>
                       <i class="fa fa-smile"></i>
                     </div>
-                    <input type="text" class="form-control" placeholder="Enter text here..." />
-                    <span class="input-group-text btn btn-success">
+                    <textarea style={{ resize: 'none' }} name="message" value={message} onChange={(e) => { setValue(e); }} class="form-control m-0 p-3" placeholder="Type messages here..." rows={1} defaultValue={""} />
+                    <span onClick={() => { sendMessage(chatUsername) }} class="input-group-text btn btn-success send">
                       <i class="fa fa-paper-plane"></i>
                     </span>
                   </div>
@@ -664,7 +667,7 @@ export default function ChatPage(props) {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 AOS.init();

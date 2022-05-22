@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import ChatPage from './ChatPage'
 import Login from './Login'
 import Signup from './Signup'
@@ -7,20 +7,12 @@ import { useDispatch, useSelector } from 'react-redux';
 
 export default function MainNav(props) {
 
-  // var user = useSelector(state => state.user)
-  // const [user, setuser] = useState({})
-  // setuser(useSelector(state => state.user))
-  // localStorage.setItem('Name', "chat-app-current-user")
-  // console.log(localStorage.getItem("Name"));
+  const dispatch = useDispatch();
   const user = useSelector(state => state.user)
 
-  console.log(user);
-
-  const dispatch = useDispatch();
-
   function logout() {
+    localStorage.removeItem('token')
     dispatch({ type: "LOGOUT_USER" });
-    console.log(props);
     // props.history.push("/");
   }
 

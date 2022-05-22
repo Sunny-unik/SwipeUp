@@ -6,6 +6,9 @@ var ObjectId = require('mongodb').ObjectId;
 var nodemailer = require('nodemailer');
 var upload = require('./multerConfig');
 var path = require('path');
+const jwt = require('jsonwebtoken');
+const auth = require('./auth');
+const { decode } = require('punycode');
 
 var connectedUsers = [];
 
@@ -102,7 +105,24 @@ app.post('/check-login', bodyParser.json(), (req, res) => {
     var usercollection = connection.db('SwipeUp').collection('Users');
     usercollection.find({ $or: [{ uemail: req.body.email }, { uusername: req.body.email }], upassword: req.body.password }).toArray((err, result) => {
         if (!err && result.length > 0) {
-            res.send({ status: 'ok', data: result[0] });
+            let token = jwt.sign({ username: result[0].uusername }, 'verySecretCode', { expiresIn: '7d' })
+            console.log(token);
+            res.send({ status: 'ok', data: { ...result[0], token } });
+        } else {
+            res.send({ status: 'error', data: err })
+        }
+    })
+})
+
+app.get('/validate', bodyParser.json(), auth, (req, res) => {
+    var usercollection = connection.db('SwipeUp').collection('Users');
+    console.log(req);
+    const token = req.headers.authorization.split(' ')[1];
+    const decodeToken = jwt.verify(token, 'verySecretCode')
+    usercollection.findOne({ uusername: decodeToken.username }).then((result, err) => {
+        console.log(result);
+        if (result) {
+            res.send({ status: 'ok', data: result });
         } else {
             res.send({ status: 'error', data: err })
         }
@@ -150,8 +170,7 @@ app.post('/update-password', bodyParser.json(), (req, res) => {
 app.post('/update-profile', (req, res) => {
     upload(req, res, (err) => {
         if (err) {
-            console.log("Error Occured during upload ");
-            console.log(err);
+            console.log("Error", err);
             res.send({ status: "failed", data: err });
         }
         else {

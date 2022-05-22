@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import './css/loginSignup.css'
-import axios from 'axios';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { checkLogin } from '../actions/userAction';
+import { checkLogin, validateUser } from '../actions/userAction';
 import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
+import './css/loginSignup.css'
 
 export default function Login() {
 
     const [otp, setotp] = useState("")
-    const [users, setUser] = useState([]);
+    const [users, setUsers] = useState([]);
     const [password, setpassword] = useState("");
     const [email, setemail] = useState("");
     const [newpassword, setnewpassword] = useState("")
@@ -17,21 +17,22 @@ export default function Login() {
 
     const reduxUser = useSelector(state => state.user);
     const navigate = useNavigate()
+    const dispatch = useDispatch();
 
     useEffect(() => {
+        let localToken = localStorage.getItem("token")
         if (reduxUser) {
-            console.log(reduxUser);
             navigate("/chats")
+        } else if (!!localToken) {
+            dispatch(validateUser(localToken));
         }
     }, [reduxUser]);
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_API_URL}/list-account`).then((res) => {
-            setUser(res.data.data)
+            setUsers(res.data.data)
         })
     }, [])
-
-    const dispatch = useDispatch();
 
     function setValue(e) {
         e.target.name === "otplogin" && setotp(e.target.value)

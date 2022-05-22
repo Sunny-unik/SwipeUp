@@ -1,25 +1,36 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AOS from "aos";
 import Picker from 'emoji-picker-react';
 import Loading from "./Loading";
-import { updateUser } from "../actions/userAction";
+import { updateProfile, validateUser } from "../actions/userAction";
 
 export default function ChatPage(props) {
-  const user = useSelector((state) => state.user);
+
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user)
+  const navigate = useNavigate()
+
   useEffect(() => {
-    if (!user) {
-      console.log(props);
-      props.history.push("/");
+    console.log("ds");
+    if (!user || user === null) {
+      console.log("aaya");
+      let localToken = localStorage.getItem("token")
+      !localToken ? navigate("/") : dispatch(validateUser(localToken));
     }
-  });
-  // console.log(user);
+  }, [user]);
+  console.log(user);
+
   const userId = useSelector((state) => state.user._id);
   const userName = useSelector((state) => state.user.uname);
   const userUserName = useSelector((state) => state.user.uusername);
   const userPassword = useSelector((state) => state.user.upassword);
   const userEmail = useSelector((state) => state.user.uemail);
+  const userToken = useSelector((state) => state.user.token);
+  localStorage.setItem('token', userToken)
+  const userSocket = useSelector((state) => state.user.socket);
+  console.log(userSocket);
   var userImage = useSelector((state) => state.user.profile);
 
   const [uname, setuname] = useState(userName);
@@ -84,14 +95,14 @@ export default function ChatPage(props) {
 
   function updateDetails() {
     let updateUserDetails = { userId, uname, uemail };
-    // updateUser(updateUserDetails)
-    axios.post(`${process.env.REACT_APP_API_URL}/update-user`, updateUserDetails)
-      .then((res) => {
-        alert(res.data.data);
-      })
-      .catch((res) => {
-        alert("Edit not saved :(");
-      });
+    dispatch(updateProfile(updateUserDetails))
+    // axios.post(`${process.env.REACT_APP_API_URL}/update-user`, updateUserDetails)
+    //   .then((res) => {
+    //     alert(res.data.data);
+    //   })
+    //   .catch((res) => {
+    //     alert("Edit not saved :(");
+    //   });
   }
 
   function changePassword() {
@@ -213,21 +224,21 @@ export default function ChatPage(props) {
   // notifications
   const [notification, setnotification] = useState([]);
   useEffect(() => {
-    setInterval(() => {
-      axios.post(`${process.env.REACT_APP_API_URL}/get-notif`, myUsername).then((res) => {
-        if (res.data.status == "ok") {
-          if (res.data.data[0].friends) {
-            var notifs = res.data.data[0].friends.filter(function (s) {
-              var recieve = s.recieved == true;
-              var status = s.status == false;
-              return recieve && status;
-            });
-            // console.log(notifs);
-            setnotification(notifs);
-          }
+    // setInterval(() => {
+    axios.post(`${process.env.REACT_APP_API_URL}/get-notif`, myUsername).then((res) => {
+      if (res.data.status == "ok") {
+        if (res.data.data[0].friends) {
+          var notifs = res.data.data[0].friends.filter(function (s) {
+            var recieve = s.recieved == true;
+            var status = s.status == false;
+            return recieve && status;
+          });
+          // console.log(notifs);
+          setnotification(notifs);
         }
-      });
-    }, 2000);
+      }
+    });
+    // }, 2000);
   }, []);
 
   var mainnotif = notification.map((S, i) => {
@@ -258,21 +269,21 @@ export default function ChatPage(props) {
   const [friendlist, setfriendlist] = useState([]);
   const [loadingFriendlist, setloadingFriendlist] = useState(undefined);
   useEffect(() => {
-    setInterval(() => {
-      axios.post(`${process.env.REACT_APP_API_URL}/myFriends`, myUsername).then((res) => {
-        if (res.data.status == "ok") {
-          if (res.data.data[0].friends) {
-            var friends = res.data.data[0].friends.filter(function (s) {
-              var status = s.status == true;
-              return status;
-            });
-            // console.log(friends);
-            setfriendlist(friends);
-            setloadingFriendlist(true)
-          }
-        } else { setloadingFriendlist(false) }
-      });
-    }, 2000);
+    // setInterval(() => {
+    axios.post(`${process.env.REACT_APP_API_URL}/myFriends`, myUsername).then((res) => {
+      if (res.data.status == "ok") {
+        if (res.data.data[0].friends) {
+          var friends = res.data.data[0].friends.filter(function (s) {
+            var status = s.status == true;
+            return status;
+          });
+          // console.log(friends);
+          setfriendlist(friends);
+          setloadingFriendlist(true)
+        }
+      } else { setloadingFriendlist(false) }
+    });
+    // }, 2000);
   }, []);
 
   const [fname, setfname] = useState([]);
@@ -491,7 +502,7 @@ export default function ChatPage(props) {
                         <img className="avatar-xl mt-2" height='55px' width='55px' alt="image"
                           src={userImage ? `${process.env.REACT_APP_API_URL + '/' + userImage}` : 'defaultProfile.jpg'} />
                         <div className="column">
-                          <input type="file" accept="image/png,image/jpg,image/jpeg" className="rounded btn btn-light w-75 ml-1"
+                          <input type="file" accept="image/png,image/jpg,image/jpeg" className="rounded btn btn-light w-75 ml-1" onChange={(e) => { setProfile(e) }}
                             style={{ overflow: "hidden" }} />
                           {/* <span className="btn btn-primary w-50 m-1 bg-primary" >Upload</span> */}
                           <div className="text-center">
@@ -522,15 +533,18 @@ export default function ChatPage(props) {
                     <form>
                       <div className="field">
                         <label htmlFor="password">Old Password</label>
-                        <input type="password" name="oldpassword" className="form-control" id="password" placeholder="Enter a new password" required value={oldpassword} onChange={(e) => { setValue(e) }} />
+                        <input type="password" name="oldpassword" className="form-control" id="password"
+                          placeholder="Enter current password" required value={oldpassword} onChange={(e) => { setValue(e) }} />
                       </div>
                       <div className="field">
                         <label htmlFor="password">New Password</label>
-                        <input type="password" name="newpassword" className="form-control" id="password" placeholder="Enter a new password" required value={newpassword} onChange={(e) => { setValue(e) }} />
+                        <input type="password" name="newpassword" className="form-control" id="password"
+                          placeholder="Enter new password" required value={newpassword} onChange={(e) => { setValue(e) }} />
                       </div>
                       <div className="field">
                         <label htmlFor="password">Re-enter New Password</label>
-                        <input type="password" name="re-enter-new-password" className="form-control" id="password" placeholder="Enter a new password" required value={reenternewpassword} onChange={(e) => { setValue(e) }} />
+                        <input type="password" name="re-enter-new-password" className="form-control" id="password"
+                          placeholder="Enter again new password" required value={reenternewpassword} onChange={(e) => { setValue(e) }} />
                       </div>
                       <button type="button" className="btn button w-100 mt-2" onClick={changePassword}>Change Password</button>
                     </form>

@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 import AOS from "aos";
 import Picker from 'emoji-picker-react';
@@ -9,18 +10,19 @@ import { updateProfile, validateUser } from "../actions/userAction";
 export default function ChatPage(props) {
 
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user)
   const navigate = useNavigate()
+  const user = useSelector((state) => state.user)
 
   useEffect(() => {
     console.log("ds");
     if (!user || user === null) {
-      console.log("aaya");
       let localToken = localStorage.getItem("token")
       !localToken ? navigate("/") : dispatch(validateUser(localToken));
     }
   }, [user]);
   console.log(user);
+
+  if (user === null) window.location = '/';
 
   const userId = useSelector((state) => state.user._id);
   const userName = useSelector((state) => state.user.uname);

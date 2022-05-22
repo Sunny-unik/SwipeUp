@@ -4,6 +4,7 @@ export function user(state = null, action) {
         case "LOGIN_USER":
             return action.payload;
         case "VALIDATE_USER":
+            console.log(action);
             return action.payload;
         case "UPDATE_PROFILE":
             console.log(action);

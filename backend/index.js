@@ -116,11 +116,9 @@ app.post('/check-login', bodyParser.json(), (req, res) => {
 
 app.get('/validate', bodyParser.json(), auth, (req, res) => {
     var usercollection = connection.db('SwipeUp').collection('Users');
-    console.log(req);
     const token = req.headers.authorization.split(' ')[1];
     const decodeToken = jwt.verify(token, 'verySecretCode')
     usercollection.findOne({ uusername: decodeToken.username }).then((result, err) => {
-        console.log(result);
         if (result) {
             res.send({ status: 'ok', data: result });
         } else {
@@ -146,11 +144,10 @@ app.post('/user-by-email', bodyParser.json(), (req, res) => {
 
 app.post('/update-user', bodyParser.json(), (req, res) => {
     var userCollection = connection.db('SwipeUp').collection('Users');
-    userCollection.update({ _id: ObjectId(req.body.userId) }, { $set: { uname: req.body.uname, uemail: req.body.uemail } }, (err, result) => {
+    userCollection.update({ _id: ObjectId(req.body.userId) }, { $set: { uname: req.body.uname } }, (err, result) => {
         if (!err) {
-            res.send({ status: "success", data: "user details updated sucessfully" });
-        }
-        else {
+            res.send({ status: "success", data: "user details updated sucessfully", allData: result });
+        } else {
             res.send({ status: "failed", data: err });
         }
     })
@@ -188,10 +185,10 @@ app.post('/update-profile', (req, res) => {
 
 app.post('/add-friend', bodyParser.json(), (req, res) => {
     const collection = connection.db('SwipeUp').collection('Users');
-    var friend = req.body.friend;
+    var friend = req.body.uid;
     var myUsername = req.body.userUserName;
     collection.updateOne({ 'uusername': myUsername }, { $push: { friends: { name: friend, status: false, sent: true, recieved: false } } })
-    collection.updateOne({ 'uusername': friend }, { $push: { friends: { name: myUsername, status: false, sent: false, recieved: true } } }
+    collection.updateOne({ 'uusername': uid }, { $push: { friends: { name: myUsername, status: false, sent: false, recieved: true } } }
         , (err, result) => {
             if (!err) {
                 res.send({ status: "ok", data: "Friend Request Sent" });
@@ -361,7 +358,6 @@ app.post('/delete-a-message', bodyParser.json(), (req, res) => {
 // delete all msg between two persons
 app.post('/delete-all-message', bodyParser.json(), (req, res) => {
     const collection = connection.db('SwipeUp').collection('Messages');
-    // console.log(req.body);
     collection.deleteMany({ userUserName: (req.body.frnd), friendUsername: (req.body.mine) })
     collection.deleteMany({ userUserName: (req.body.mine), friendUsername: (req.body.frnd) }, (err, result) => {
         if (!err) {

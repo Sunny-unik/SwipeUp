@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AOS from "aos";
 import Picker from 'emoji-picker-react';
 import Loading from "./Loading";
-import { updateProfile, validateUser } from "../actions/userAction";
+import { updateDetails, updateProfile, validateUser } from "../actions/userAction";
 
 export default function ChatPage(props) {
 
@@ -14,7 +14,6 @@ export default function ChatPage(props) {
   const user = useSelector((state) => state.user)
 
   useEffect(() => {
-    console.log("ds");
     if (!user || user === null) {
       let localToken = localStorage.getItem("token")
       !localToken ? navigate("/") : dispatch(validateUser(localToken));
@@ -43,7 +42,6 @@ export default function ChatPage(props) {
   const [uusername, setuusername] = useState(userUserName);
   const [friend, setfriend] = useState("");
   var profile;
-
   const [uploadPercentage, setuploadPercentage] = useState("");
   const [message, setmessage] = useState("");
 
@@ -71,16 +69,13 @@ export default function ChatPage(props) {
       console.log(profile);
       axios
         .post(`${process.env.REACT_APP_API_URL}/update-profile`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { "Content-Type": "multipart/form-data", },
           onUploadProgress: function (progressEvent) {
             console.log("file Uploading Progresss.......");
-            // console.log(progressEvent);
-            setuploadPercentage(
-              parseInt(Math.round((progressEvent.loaded / progressEvent.total) * 100))
+            console.log(progressEvent);
+            setuploadPercentage(parseInt(Math.round((progressEvent.loaded / progressEvent.total) * 100))
             );
-            //   setfileInProgress(progressEvent.fileName)
+            // setfileInProgress(progressEvent.fileName)
           },
         })
         .then((res) => {
@@ -93,18 +88,6 @@ export default function ChatPage(props) {
     } else {
       alert("please choose profile");
     }
-  }
-
-  function updateDetails() {
-    let updateUserDetails = { userId, uname, uemail };
-    dispatch(updateProfile(updateUserDetails))
-    // axios.post(`${process.env.REACT_APP_API_URL}/update-user`, updateUserDetails)
-    //   .then((res) => {
-    //     alert(res.data.data);
-    //   })
-    //   .catch((res) => {
-    //     alert("Edit not saved :(");
-    //   });
   }
 
   function changePassword() {
@@ -144,6 +127,9 @@ export default function ChatPage(props) {
     }
   }
 
+  let allUsers;
+  axios.get(`${process.env.REACT_APP_API_URL}/list-account`).then((res) => { allUsers = res.data.data; })
+
   function addFriend() {
     if (friend != "") {
       if (friend != userUserName) {
@@ -152,25 +138,23 @@ export default function ChatPage(props) {
             axios.post(`${process.env.REACT_APP_API_URL}/get-notif`, myUsername).then((res) => {
               if (res.data.data[0].friends) {
                 if (res.data.data[0].friends.length >= 1) {
-                  var forUnique = res.data.data[0].friends.map((a) => {
-                    return a.name;
-                  });
+                  var forUnique = res.data.data[0].friends.map((a) => { return a.name; });
                   var status = forUnique.some((elem) => elem === friend);
                   if (status == true) {
                     alert("you cant send friend request again");
                   } else {
-                    // id validation that user exist or not
-                    var addfrnd = { friend, userUserName };
-                    axios
-                      .post(`${process.env.REACT_APP_API_URL}/add-friend`, addfrnd)
-                      .then((res) => {
-                        alert(res.data.data);
-                        setfriend("");
-                      });
+                    let uid = allUsers.filter((u) => u.uusername === friend)
+                    console.log(uid);
+                    var addfrnd = { uid, userUserName };
+                    axios.post(`${process.env.REACT_APP_API_URL}/add-friend`, addfrnd).then((res) => {
+                      alert(res.data.data);
+                      setfriend("");
+                    });
                   }
                 }
               } else {
-                var addfrnd = { friend, userUserName };
+                let uid = allUsers.filter((u) => u.uusername === friend)
+                var addfrnd = { uid, userUserName };
                 axios.post(`${process.env.REACT_APP_API_URL}/add-friend`, addfrnd).then((res) => {
                   alert(res.data.data);
                   setfriend("");
@@ -209,9 +193,8 @@ export default function ChatPage(props) {
       });
   }
 
-  function unfriend(mine, frnd) {
-    axios
-      .post(`${process.env.REACT_APP_API_URL}/unfriend-or-decline`, { mine, frnd })
+  function unfriend(mine, frnd, e) {
+    axios.post(`${process.env.REACT_APP_API_URL}/unfriend-or-decline`, { mine, frnd })
       .then((res) => {
         if (res.data.status == "ok") {
           alert(res.data.data);
@@ -278,14 +261,13 @@ export default function ChatPage(props) {
             var status = s.status == true;
             return status;
           });
-          // console.log(friends);
           setfriendlist(friends);
           setloadingFriendlist(true)
         }
       } else { setloadingFriendlist(false) }
     });
     // }, 2000);
-  }, []);
+  }, [friendlist.length]);
 
   const [fname, setfname] = useState([]);
   const [chatName, setchatName] = useState("");
@@ -462,18 +444,12 @@ export default function ChatPage(props) {
             <div className="people-list" id="plist">
               {/* data-aos="flip-left" data-aos-once='true' data-aos-duration="300" */}
               <div className="startList">
-                <div class="input-group">
-                  <div class="input-group-prepend">
-                    <input type="text" class="form-control" placeholder="Search..." />
-                    <span class="input-group-text btn btn-light rounded">
-                      <i class="fa fa-search"></i>
-                    </span>
-                  </div>
-                </div>
+                {/* <div class="input-group"><div class="input-group-prepend"><input type="text" class="form-control" placeholder="Search..." />
+                    <span class="input-group-text btn btn-light rounded"><i class="fa fa-search"></i></span></div></div> */}
                 <ul class="list-unstyled chat-list mt-2 mb-0">
                   {loadingFriendlist === undefined && <Loading />}
                   {friendlist.length > 0 ? friendlist.map((e, i) => {
-                    return <li class="clearfix" onClick={() => { openChat(e.name) }}>
+                    return <li class="clearfix" dataName={e.name} onClick={() => { openChat(e.name) }}>
                       <img src={userImage ? `${process.env.REACT_APP_API_URL + '/' + userImage}` : `defaultProfile.jpg`}
                         alt="avatar" style={{ aspectRatio: "1 / 1" }} />
                       <div class="about">
@@ -519,15 +495,15 @@ export default function ChatPage(props) {
                           <input type="text" className="form-control" placeholder="Name" name="Uname" value={uname} onChange={(e) => { setValue(e) }} required />
                         </div>
                         <div className="field">
-                          <label htmlFor="username">username</label>
-                          <input type="text" name="Uusername" className="form-control" id="username" placeholder="username" disabled value={uusername} onChange={(e) => { setValue(e) }} />
+                          <label htmlFor="username">Username </label>
+                          <input type="text" name="Uusername" className="form-control" id="username" placeholder="Username" value={uusername} onChange={(e) => { setValue(e) }} />
                         </div>
                       </div>
                       <div className="field">
                         <label htmlFor="email">Email </label>
-                        <input type="email" name="Uemail" className="form-control" id="email" placeholder="Enter your email address" required value={uemail} onChange={(e) => { setValue(e) }} />
+                        <input type="email" name="Uemail" className="form-control" id="email" placeholder="Enter your email address" required disabled value={uemail} onChange={(e) => { setValue(e) }} />
                       </div>
-                      <button type="button" className="btn button w-100 mt-2" onClick={updateDetails} >Apply Changes</button>
+                      <button type="button" className="btn button w-100 mt-2" onClick={(e) => { dispatch(updateDetails({ uname, uusername }, user)) }} >Apply Changes</button>
                     </form>
                   </details>
                   <details className="text-primary" style={{ marginTop: "2rem", fontSize: "1.2rem", fontWeight: "bold" }}>
@@ -581,6 +557,7 @@ export default function ChatPage(props) {
               </div>
               {setIconEvents()}
             </div>
+            {/* End of leftbar */}
 
             <div className="startScreen" style={{ overflow: 'hidden', height: 'min-content' }}>
               <img className="bg-secondary w-100" src='/robot.gif' alt="hey :-)" style={{ height: '93vh' }} />
@@ -608,7 +585,7 @@ export default function ChatPage(props) {
                           <i className="fa fa-trash"></i>&nbsp;
                           Clear Chat History
                         </button>
-                        <button onClick={() => { unfriend(myUsername.userUserName, chatUsername) }} className="dropdown-item">
+                        <button onClick={(e) => { unfriend(myUsername.userUserName, chatUsername, e) }} className="dropdown-item">
                           <i className="fas fa-user-slash"></i>&nbsp;
                           Unfriend {chatUsername}
                         </button>

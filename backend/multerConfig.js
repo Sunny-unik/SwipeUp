@@ -19,10 +19,9 @@ var storage = multer.diskStorage(
 var multerOptions = {
     storage: storage,
     fileFilter: function (req, file, callback) {
-        console.log(file);
+        console.log(file, callback, req);
         var ext = path.extname(file.originalname);
         var fieldName = file.fieldname;
-
         if (fieldName == "profile") {
             if (ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
                 return callback(new Error('Only images are allowed for profile'));

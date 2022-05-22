@@ -201,8 +201,7 @@ export default function ChatPage(props) {
   }
 
   function decline(mine, frnd) {
-    axios
-      .post(`${process.env.REACT_APP_API_URL}/unfriend-or-decline`, { mine, frnd })
+    axios.post(`${process.env.REACT_APP_API_URL}/unfriend-or-decline`, { mine, frnd })
       .then((res) => {
         if (res.data.status == "ok") {
           alert(res.data.data);
@@ -479,10 +478,11 @@ export default function ChatPage(props) {
                         alt="avatar" style={{ aspectRatio: "1 / 1" }} />
                       <div class="about">
                         <div class="name text-dark">{e.name}</div>
-                        {/* <div class="status"> <i class="fa fa-circle offline"></i> {e.status} </div>                                             */}
+                        {/* <div class="status"> <i class="fa fa-circle offline"></i> {e.status} </div> */}
                       </div>
                     </li>
-                  }) : <li className="clearfix"><div className="text-center name">Your friend list is empty, start chatting to friends by sending them friend requests.</div></li>}
+                  }) : <li className="clearfix"><div className="text-center name">
+                    Your friend list is empty, start chatting to friends by sending them friend requests.</div></li>}
                 </ul>
               </div>
               <div className="profileTab" style={{ display: "none", overflowY: "auto", height: '85vh', overflowX: "hidden" }}>

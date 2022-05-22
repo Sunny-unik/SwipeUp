@@ -8,6 +8,7 @@ export function user(state = null, action) {
             return action.payload;
         case "UPDATE_PROFILE":
             console.log(action);
+            let updateState;
             return action.payload;
         case "LOGOUT_USER":
             return null;

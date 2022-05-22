@@ -269,8 +269,10 @@ app.post('/accept-request', bodyParser.json(), (req, res) => {
 
 app.post('/unfriend-or-decline', bodyParser.json(), (req, res) => {
     const collection = connection.db('SwipeUp').collection('Users');
-    collection.updateOne({ "uusername": req.body.mine, "friends": { $elemMatch: { "name": req.body.frnd } } }, { $set: { "friends.$.name": "", "friends.$.status": false, "friends.$.recieved": false, "friends.$.sent": false } })
-    collection.updateOne({ "uusername": req.body.frnd, "friends": { $elemMatch: { "name": req.body.mine } } }, { $set: { "friends.$.name": "", "friends.$.status": false, "friends.$.recieved": false, "friends.$.sent": false } }
+    // collection.updateOne({ "uusername": req.body.mine, "friends": { $elemMatch: { "name": req.body.frnd } } }, { $set: { "friends.$.name": "", "friends.$.status": false, "friends.$.recieved": false, "friends.$.sent": false } })
+    // collection.updateOne({ "uusername": req.body.frnd, "friends": { $elemMatch: { "name": req.body.mine } } }, { $set: { "friends.$.name": "", "friends.$.status": false, "friends.$.recieved": false, "friends.$.sent": false } }
+    collection.updateOne({ "uusername": req.body.mine }, { $pull: { friends: { "name": req.body.frnd } } })
+    collection.updateOne({ "uusername": req.body.frnd }, { $pull: { friends: { "name": req.body.mine } } }
         , (err, result) => {
             if (!err) {
                 res.send({ status: "ok", data: "friend unfriend or request declined" });

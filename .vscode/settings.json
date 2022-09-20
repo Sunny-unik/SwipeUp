@@ -1,0 +1,41 @@
+{
+  "liveServer.settings.donotShowInfoMsg": true,
+  "workbench.editorAssociations": {
+    "*.json": "default"
+  },
+  "editor.formatOnSave": true,
+  "prettier.endOfLine": "auto",
+  "prettier.vueIndentScriptAndStyle": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "prettier.singleQuote": true,
+  "workbench.productIconTheme": "bootstrap-product-icons",
+  "workbench.iconTheme": "material-icon-theme",
+  "workbench.colorTheme": "GitHub Dark Default",
+  "editor.fontLigatures": false,
+  "typescript.preferences.quoteStyle": "double",
+  "javascript.preferences.quoteStyle": "double",
+  "diffEditor.ignoreTrimWhitespace": false,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "files.trimFinalNewlines": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingJsxExpressionBraces": true,
+  "javascript.format.insertSpaceBeforeFunctionParenthesis": false,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+  "typescript.format.insertSpaceBeforeFunctionParenthesis": false,
+  "typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "emmet.includeLanguages": {
+    "javascript": "javascriptreact"
+  },
+  "editor.cursorSmoothCaretAnimation": true,
+  "editor.cursorBlinking": "phase",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "files.associations": {
+    "*.jsx": "javascriptreact"
+  },
+  "editor.tabSize": 2,
+  "typescript.format.insertSpaceAfterTypeAssertion": true
+}

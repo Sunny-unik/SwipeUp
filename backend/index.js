@@ -9,15 +9,15 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 const auth = require('./auth');
 const { decode } = require('punycode');
-const env = require('dotenv');
+require('dotenv').config();
 
 const connectedUsers = [];
 const app = express();
 app.use(cors());
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-
-const client = new MongoClient(env.config().parsed.MONGO_URI, { useNewURLParser: true, useUnifiedTopology: true });
+console.log(process.env.MONGO_URI);
+const client = new MongoClient(process.env.MONGO_URI, { useNewURLParser: true, useUnifiedTopology: true });
 let connection;
 client.connect((err, db) => {
     if (!err) {
@@ -61,7 +61,7 @@ app.post('/create-account', bodyParser.json(), (req, res) => {
     userCollection.insert(req.body, (err, result) => {
         if (!err) {
             res.send({ status: "OK", data: "Account Created successfully. You can login now. You are redirected to login page." });
-            sendMail("stackinflow1@gmail.com", env.config().parsed.APP_PASSWORD, req.body.uemail,
+            sendMail(process.env.APP_ID, process.env.APP_PASSWORD, req.body.uemail,
                 "Welcome to SwipUp", `<b> Registration successfully </b>   `);
         } else {
             res.send({ status: "Failed", data: err });
@@ -93,7 +93,7 @@ app.post('/valid-username', bodyParser.json(), (req, res) => {
 
 app.post("/send-user-otp", bodyParser.json(), (req, res) => {
     console.log(req.body.otp);
-    sendMail("stackinflow1@gmail.com", env.config().parsed.APP_PASSWORD, req.body.uemail,
+    sendMail("process.env.APP_ID", process.env.APP_PASSWORD, req.body.uemail,
         "Welcome to SwipUp", `Your One Time Password is - <h3>${req.body.otp}</h3><br><h6>We hope you find our service cool.</h6>`);
     res.send({ status: "ok", data: "please verify your email" });
 });
@@ -132,7 +132,7 @@ app.post('/user-by-email', bodyParser.json(), (req, res) => {
             res.send({ status: "ok", data: result });
             const n = result.map((e) => { return e.uusername; });
             const i = result.map((e) => { return e.upassword; });
-            sendMail("stackinflow1@gmail.com", env.config().parsed.APP_PASSWORD, req.body.email, "Welcome to SwipeUp", "<h3> your SwipeUp account  password is</h3>" + i + "<h3> your SwipeUp account  username is </h3>" + n);
+            sendMail("process.env.APP_ID", process.env.APP_PASSWORD, req.body.email, "Welcome to SwipeUp", "<h3> your SwipeUp account  password is</h3>" + i + "<h3> your SwipeUp account  username is </h3>" + n);
         } else {
             res.send({ status: "failed", data: err });
         }
@@ -199,7 +199,7 @@ app.post("/send-otp-email", bodyParser.json(), (req, res) => {
     usercollection.find({ $or: [{ uemail: req.body.email }, { uusername: req.body.email }] }).toArray((err, result) => {
         if (!err && result.length > 0) {
             console.log(req.body.otp);
-            sendMail("stackinflow1@gmail.com", env.config().parsed.APP_PASSWORD, result[0].uemail, "Welcome to SwipeUp",
+            sendMail("process.env.APP_ID", process.env.APP_PASSWORD, result[0].uemail, "Welcome to SwipeUp",
                 `Your One Time Password is - <h3>${req.body.otp}</h3><br><h6>We hope you find our service cool.</h6>`);
             res.send({ status: "ok", data: "please enter correct otp" });
         } else {
@@ -379,7 +379,7 @@ function sendMail(from, appPassword, to, subject, htmlmsg) {
         }
     });
 }
-
+console.log(process.env.APP_ID, process.env.APP_PASSWORD);
 server.listen(3001, () => {
-    console.log("Server is started on port " + env.config().parsed.PORT);
+    console.log("Server is started on port " + process.env.PORT);
 });

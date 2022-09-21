@@ -93,7 +93,7 @@ app.post('/valid-username', bodyParser.json(), (req, res) => {
 
 app.post("/send-user-otp", bodyParser.json(), (req, res) => {
     console.log(req.body.otp);
-    sendMail("process.env.APP_ID", process.env.APP_PASSWORD, req.body.uemail,
+    sendMail(process.env.APP_ID, process.env.APP_PASSWORD, req.body.uemail,
         "Welcome to SwipUp", `Your One Time Password is - <h3>${req.body.otp}</h3><br><h6>We hope you find our service cool.</h6>`);
     res.send({ status: "ok", data: "please verify your email" });
 });
@@ -132,7 +132,7 @@ app.post('/user-by-email', bodyParser.json(), (req, res) => {
             res.send({ status: "ok", data: result });
             const n = result.map((e) => { return e.uusername; });
             const i = result.map((e) => { return e.upassword; });
-            sendMail("process.env.APP_ID", process.env.APP_PASSWORD, req.body.email, "Welcome to SwipeUp", "<h3> your SwipeUp account  password is</h3>" + i + "<h3> your SwipeUp account  username is </h3>" + n);
+            sendMail(process.env.APP_ID, process.env.APP_PASSWORD, req.body.email, "Welcome to SwipeUp", "<h3> your SwipeUp account  password is</h3>" + i + "<h3> your SwipeUp account  username is </h3>" + n);
         } else {
             res.send({ status: "failed", data: err });
         }
@@ -199,7 +199,7 @@ app.post("/send-otp-email", bodyParser.json(), (req, res) => {
     usercollection.find({ $or: [{ uemail: req.body.email }, { uusername: req.body.email }] }).toArray((err, result) => {
         if (!err && result.length > 0) {
             console.log(req.body.otp);
-            sendMail("process.env.APP_ID", process.env.APP_PASSWORD, result[0].uemail, "Welcome to SwipeUp",
+            sendMail(process.env.APP_ID, process.env.APP_PASSWORD, result[0].uemail, "Welcome to SwipeUp",
                 `Your One Time Password is - <h3>${req.body.otp}</h3><br><h6>We hope you find our service cool.</h6>`);
             res.send({ status: "ok", data: "please enter correct otp" });
         } else {

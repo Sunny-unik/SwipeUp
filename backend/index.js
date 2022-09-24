@@ -16,7 +16,7 @@ const app = express();
 app.use(cors());
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
-console.log(process.env.MONGO_URI);
+
 const client = new MongoClient(process.env.MONGO_URI, { useNewURLParser: true, useUnifiedTopology: true });
 let connection;
 client.connect((err, db) => {
@@ -92,7 +92,6 @@ app.post('/valid-username', bodyParser.json(), (req, res) => {
 });
 
 app.post("/send-user-otp", bodyParser.json(), (req, res) => {
-    console.log(req.body.otp);
     sendMail(process.env.APP_ID, process.env.APP_PASSWORD, req.body.uemail,
         "Welcome to SwipUp", `Your One Time Password is - <h3>${req.body.otp}</h3><br><h6>We hope you find our service cool.</h6>`);
     res.send({ status: "ok", data: "please verify your email" });
@@ -379,7 +378,7 @@ function sendMail(from, appPassword, to, subject, htmlmsg) {
         }
     });
 }
-console.log(process.env.APP_ID, process.env.APP_PASSWORD);
+
 server.listen(3001, () => {
-    console.log("Server is started on port " + process.env.PORT);
+    console.log("Server started on http://localhost:" + process.env.PORT);
 });

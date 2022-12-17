@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +7,7 @@ import AOS from "aos";
 import Picker from "emoji-picker-react";
 import Loading from "./Loading";
 import { updateDetails, validateUser } from "../actions/userAction";
+import RegexHelper from "../helpers/RegexHelper";
 
 export default function ChatPage() {
   const dispatch = useDispatch();
@@ -40,6 +42,7 @@ export default function ChatPage() {
   const [uusername, setuusername] = useState(userUserName);
   const [friend, setfriend] = useState("");
   var profile;
+  // eslint-disable-next-line no-unused-vars
   const [uploadPercentage, setuploadPercentage] = useState("");
   const [message, setmessage] = useState("");
 
@@ -96,9 +99,7 @@ export default function ChatPage() {
     if (userPassword === oldpassword) {
       var isvalid = true;
       //validate for password
-      var passregex =
-        /(?=(.*[0-9]))(?=.*[\!@#$%^&*()\\[\]{}\-_+=~`|:;"'<>,./?])(?=.*[a-z])(?=(.*[A-Z]))(?=(.*)).{8,}/;
-      if (!passregex.test(newpassword)) {
+      if (!RegexHelper("password").test(newpassword)) {
         alert(
           "Password should have 1 lowercase letter, 1 uppercase letter, 1 number, 1 special character and be at least 8 characters long"
         );
@@ -171,7 +172,7 @@ export default function ChatPage() {
                     }
                   } else {
                     let uid = allUsers.filter((u) => u.uusername === friend);
-                    var addfrnd = { uid, userUserName };
+                    let addfrnd = { uid, userUserName };
                     axios
                       .post(
                         `${process.env.REACT_APP_API_URL}/add-friend`,
@@ -215,7 +216,7 @@ export default function ChatPage() {
         frnd
       })
       .then((res) => {
-        if (res.data.status == "ok") {
+        if (res.data.status === "ok") {
           alert(res.data.data);
         }
       });
@@ -235,6 +236,7 @@ export default function ChatPage() {
       });
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   let myUsername = { userUserName };
 
   // notifications
@@ -257,7 +259,7 @@ export default function ChatPage() {
         }
       });
     // }, 2000);
-  }, []);
+  }, [myUsername]);
 
   var mainnotif = notification.map((S, i) => {
     return (
@@ -335,8 +337,10 @@ export default function ChatPage() {
         }
       });
     // }, 2000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [friendlist.length]);
 
+  // eslint-disable-next-line no-unused-vars
   const [fname, setfname] = useState([]);
   const [chatName, setchatName] = useState("");
   const [chatProfile, setchatProfile] = useState("");
@@ -353,7 +357,7 @@ export default function ChatPage() {
     axios
       .post(`${process.env.REACT_APP_API_URL}/friendData/?id=` + fData)
       .then((res) => {
-        if (res.data.status == "ok") {
+        if (res.data.status === "ok") {
           setfname(res.data.data);
           setchatName(res.data.data[0].uname);
           setchatUsername(res.data.data[0].uusername);
@@ -423,7 +427,7 @@ export default function ChatPage() {
 
   // send messages
   function sendMessage(friendUsername) {
-    if (message != "") {
+    if (message !== "") {
       var today = new Date();
       var date =
         today.getDate() +
@@ -658,6 +662,7 @@ export default function ChatPage() {
                     </summary>
                     <form>
                       <div className="upload">
+                        {/* eslint-disable-next-line jsx-a11y/img-redundant-alt */}
                         <img
                           className="avatar-xl mt-2"
                           height="55px"
@@ -907,7 +912,9 @@ export default function ChatPage() {
               <div className="chat-header clearfix">
                 <div className="row">
                   <div className="col-lg-6">
+                    {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                     <a
+                      // eslint-disable-next-line no-script-url
                       href="javascript:void(0);"
                       data-toggle="modal"
                       data-target="#view_info"

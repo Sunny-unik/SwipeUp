@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export default function Startlist(props) {
     console.log(props);
@@ -31,29 +31,29 @@ export default function Startlist(props) {
             name: 'Dean Henry',
             status: " offline since Oct 28 "
         },
-    ]
+    ];
 
     let userImage;
     return (
         <div className='startList'>
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <input type="text" class="form-control" placeholder="Search..." />
-                    <span class="input-group-text"><i class="fa fa-search"></i></span>
+            <div className="input-group">
+                <div className="input-group-prepend">
+                    <input type="text" className="form-control" placeholder="Search..." />
+                    <span className="input-group-text"><i className="fa fa-search"></i></span>
                 </div>
             </div>
-            <ul class="list-unstyled chat-list mt-2 mb-0">
-                {friendlist.map((e, i) => {
-                    return <li class="clearfix">
-                        <img src={userImage ? `http://localhost:3001/${userImage}` : `https://bootdey.com/img/Content/avatar/avatar${i + 1}.png`}
-                            alt="avatar" style={{ aspectRatio: '1 / 1' }} />
-                        <div class="about">
-                            <div class="name text-dark">{e.name}</div>
-                            {/* <div class="status"> <i class="fa fa-circle offline"></i> {e.status} </div>                                             */}
+            <ul className="list-unstyled chat-list mt-2 mb-0">
+                { friendlist.map((e, i) => {
+                    return <li className="clearfix">
+                        <img src={ userImage ? `http://localhost:3001/${userImage}` : `https://bootdey.com/img/Content/avatar/avatar${i + 1}.png` }
+                            alt="avatar" style={ { aspectRatio: '1 / 1' } } />
+                        <div className="about">
+                            <div className="name text-dark">{ e.name }</div>
+                            {/* <div className="status"> <i className="fa fa-circle offline"></i> {e.status} </div>                                             */ }
                         </div>
-                    </li>
-                })}
+                    </li>;
+                }) }
             </ul>
         </div>
-    )
+    );
 }

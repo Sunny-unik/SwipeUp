@@ -109,53 +109,53 @@ export default function Signup() {
 	}
 
 	return (<main>
-		<div class="layout">
-			{/* <!-- Start of Sign Up --> */}
-			<div class="main order-md-2">
-				<div class="start">
-					<div class="container">
-						<div class="col-md-12">
-							<div class="content">
+		<div className="layout">
+			{/* <!-- Start of Sign Up --> */ }
+			<div className="main order-md-2">
+				<div className="start">
+					<div className="container">
+						<div className="col-md-12">
+							<div className="content">
 								<h1>Create Account</h1>
-								<form class="signup" id="login">
+								<form className="signup" id="login">
 									<p>by use your email for registration</p>
-									<div class="form-parent">
-										<div class="form-group mx-0">
+									<div className="form-parent">
+										<div className="form-group mx-0">
 											<button className="btn icon" type="button">
-												<i class="fa fa-user"></i>
+												<i className="fa fa-user"></i>
 											</button>
-											<input className="form-control" name="Uname" value={uname} onChange={(e) => { setValue(e); }}
+											<input className="form-control" name="Uname" value={ uname } onChange={ (e) => { setValue(e); } }
 												type="text" placeholder="Name" />
 										</div>
-										<div class="form-group mx-0">
+										<div className="form-group mx-0">
 											<button className="btn icon" type="button">
-												<i class="fa fa-envelope"></i>
+												<i className="fa fa-envelope"></i>
 											</button>
-											<input className="form-control" name="Uemail" value={uemail} onChange={(e) => { setValue(e); }}
+											<input className="form-control" name="Uemail" value={ uemail } onChange={ (e) => { setValue(e); } }
 												type="email" placeholder="Email" />
 										</div>
 										<div className="form-group mx-0">
 											<button className="btn icon" type="button">
-												<i class="fa fa-vcard"></i>
+												<i className="fa fa-vcard"></i>
 											</button>
-											<input className="form-control lowercase" name="Uusername" value={uusername} onChange={(e) => setValue(e)}
+											<input className="form-control lowercase" name="Uusername" value={ uusername } onChange={ (e) => setValue(e) }
 												type="text" placeholder="Username" />
 										</div>
-										<div class="form-group mx-0">
+										<div className="form-group mx-0">
 											<button className="btn icon" type="button">
-												<i class="fa fa-key"></i>
+												<i className="fa fa-key"></i>
 											</button>
-											<input className="form-control" name="Upassword" value={upassword} onChange={(e) => setValue(e)}
+											<input className="form-control" name="Upassword" value={ upassword } onChange={ (e) => setValue(e) }
 												type="password" placeholder="Password" />
 										</div>
 									</div>
 									<div className="form-group">
-										<button className="btn button" type="button" onClick={validate}>Sign up</button>
+										<button className="btn button" type="button" onClick={ validate }>Sign up</button>
 									</div>
-									<div class="callout">
+									<div className="callout">
 										<span id="createact">
 											Already have an account?
-											<NavLink exact to="/" class="btn btn-primary w-100">Sign in</NavLink>
+											<NavLink exact to="/" className="btn btn-primary w-100">Sign in</NavLink>
 										</span>
 									</div>
 								</form>
@@ -165,16 +165,16 @@ export default function Signup() {
 									<form action="" className="form-parent">
 										<div className="form-group">
 											<button type="button" className="btn icon">
-												<i class="fa fa-envelope"></i>
+												<i className="fa fa-envelope"></i>
 											</button>
-											<input className="form-control" name="otp" value={otp} onChange={(e) => setValue(e)}
+											<input className="form-control" name="otp" value={ otp } onChange={ (e) => setValue(e) }
 												type="text" placeholder="Enter OTP " />
 										</div>
 										<div className="form-group">
-											<button style={{ width: "42%" }} className="d-inline=block mr-3 btn button" type="button"
-												onClick={goback} >Edit-details</button>
-											<button style={{ width: "42%" }} className="d-inline=block ml-3 btn button" type="button"
-												onClick={otpcheck}>Submit</button>
+											<button style={ { width: "42%" } } className="d-inline=block mr-3 btn button" type="button"
+												onClick={ goback } >Edit-details</button>
+											<button style={ { width: "42%" } } className="d-inline=block ml-3 btn button" type="button"
+												onClick={ otpcheck }>Submit</button>
 										</div>
 									</form>
 								</div>
@@ -185,10 +185,10 @@ export default function Signup() {
 			</div>
 			{/* <!-- End of Sign Up -->
 			<!-- Start of Sidebar --> */}
-			<div class="aside order-md-1">
-				<div class="container">
-					<div class="col-md-12">
-						<div class="preference">
+			<div className="aside order-md-1">
+				<div className="container">
+					<div className="col-md-12">
+						<div className="preference">
 							<h2>Welcome Back!</h2>
 							<p>To keep connected with your friends please login with your personal info.</p>
 							<NavLink exact to="/"><button className="btn button" type="button">Sign in</button></NavLink>
@@ -197,11 +197,11 @@ export default function Signup() {
 				</div>
 			</div>
 
-			{/* <!-- End of Sidebar --> */}
+			{/* <!-- End of Sidebar --> */ }
 		</div>
 		<Routes>
-			<Route path="/" exact component={Login} />
+			<Route path="/" exact component={ Login } />
 		</Routes>
-		{/* <!-- Layout --> */}
+		{/* <!-- Layout --> */ }
 	</main>);
 }

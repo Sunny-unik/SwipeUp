@@ -5,34 +5,32 @@ import { useDispatch, useSelector } from "react-redux";
 import AOS from "aos";
 import Picker from 'emoji-picker-react';
 import Loading from "./Loading";
-import { updateDetails, updateProfile, validateUser } from "../actions/userAction";
+import { updateDetails, validateUser } from "../actions/userAction";
 
-export default function ChatPage(props) {
-
+export default function ChatPage() {
   const dispatch = useDispatch();
-  const navigate = useNavigate()
-  const user = useSelector((state) => state.user)
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.user);
 
   useEffect(() => {
-    if (!user || user === null) {
-      let localToken = localStorage.getItem("token")
+    if (!user) {
+      const localToken = localStorage.getItem("token");
       !localToken ? navigate("/") : dispatch(validateUser(localToken));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
   console.log(user);
 
-  if (user === null) window.location = '/';
-
-  const userId = useSelector((state) => state.user._id);
-  const userName = useSelector((state) => state.user.uname);
-  const userUserName = useSelector((state) => state.user.uusername);
-  const userPassword = useSelector((state) => state.user.upassword);
-  const userEmail = useSelector((state) => state.user.uemail);
-  const userToken = useSelector((state) => state.user.token);
-  localStorage.setItem('token', userToken)
-  const userSocket = useSelector((state) => state.user.socket);
+  const userId = user?._id;
+  const userName = user?.uname;
+  const userUserName = user?.uusername;
+  const userPassword = user?.upassword;
+  const userEmail = user?.uemail;
+  const userToken = user?.token;
+  userToken && localStorage.setItem('token', userToken);
+  const userSocket = user?.socket;
+  let userImage = user?.profile;
   console.log(userSocket);
-  var userImage = useSelector((state) => state.user.profile);
 
   const [uname, setuname] = useState(userName);
   const [uemail, setuemail] = useState(userEmail);
@@ -91,7 +89,7 @@ export default function ChatPage(props) {
   }
 
   function changePassword() {
-    if (userPassword == oldpassword) {
+    if (userPassword === oldpassword) {
       var isvalid = true;
       //validate for password
       var passregex =
@@ -102,8 +100,8 @@ export default function ChatPage(props) {
         );
         isvalid = false;
       }
-      if (isvalid == true) {
-        if (newpassword == reenternewpassword) {
+      if (isvalid === true) {
+        if (newpassword === reenternewpassword) {
           axios
             .post(`${process.env.REACT_APP_API_URL}/update-password`, {
               userId,
@@ -128,7 +126,7 @@ export default function ChatPage(props) {
   }
 
   let allUsers;
-  axios.get(`${process.env.REACT_APP_API_URL}/list-account`).then((res) => { allUsers = res.data.data; })
+  axios.get(`${process.env.REACT_APP_API_URL}/list-account`).then((res) =>  allUsers = res.data.data );
 
   function addFriend() {
     if (friend != "") {
@@ -143,7 +141,7 @@ export default function ChatPage(props) {
                   if (status == true) {
                     alert("you cant send friend request again");
                   } else {
-                    let uid = allUsers.filter((u) => u.uusername === friend)
+                    let uid = allUsers.filter((u) => u.uusername === friend);
                     console.log(uid);
                     var addfrnd = { uid, userUserName };
                     axios.post(`${process.env.REACT_APP_API_URL}/add-friend`, addfrnd).then((res) => {
@@ -153,7 +151,7 @@ export default function ChatPage(props) {
                   }
                 }
               } else {
-                let uid = allUsers.filter((u) => u.uusername === friend)
+                let uid = allUsers.filter((u) => u.uusername === friend);
                 var addfrnd = { uid, userUserName };
                 axios.post(`${process.env.REACT_APP_API_URL}/add-friend`, addfrnd).then((res) => {
                   alert(res.data.data);
@@ -175,7 +173,7 @@ export default function ChatPage(props) {
 
   function accept(friendReq) {
     // console.log(friendReq);
-    var acceptFrnd = { friendReq, userUserName };
+    let acceptFrnd = { friendReq, userUserName };
     // console.log(acceptFrnd);
     axios.post(`${process.env.REACT_APP_API_URL}/accept-request`, acceptFrnd).then((res) => {
       if (res.data.status == "ok") {
@@ -203,7 +201,7 @@ export default function ChatPage(props) {
       });
   }
 
-  var myUsername = { userUserName };
+  let myUsername = { userUserName };
 
   // notifications
   const [notification, setnotification] = useState([]);
@@ -227,20 +225,20 @@ export default function ChatPage(props) {
 
   var mainnotif = notification.map((S, i) => {
     return (
-      <span key={S.name} className="filterNotifications all latest notification" data-toggle="list">
+      <span key={ S.name } className="filterNotifications all latest notification" data-toggle="list">
         <img className="avatar-md m-1" height='73px' width='73px' data-toggle="tooltip" data-placement="top"
-          src={S.userImage ? `${process.env.REACT_APP_API_URL + '/' + S.userImage}` : `https://bootdey.com/img/Content/avatar/avatar${i + 1}.png`} alt="avatar" />
+          src={ S.userImage ? `${process.env.REACT_APP_API_URL + '/' + S.userImage}` : `https://bootdey.com/img/Content/avatar/avatar${i + 1}.png` } alt="avatar" />
         {/* <div className="status">
           <i className="material-icons online">fiber_manual_record</i>
         </div> */}
         <div className="data">
-          <p className="m-1 px-2" style={{ minHeight: '73px', overflow: 'hidden' }}>{S.name}, has sent you a friend request.</p>
+          <p className="m-1 px-2" style={ { minHeight: '73px', overflow: 'hidden' } }>{ S.name }, has sent you a friend request.</p>
           <div className="reqButtons">
-            <button class="btn btn-success button col-sm-5 py-2" onClick={() => { accept(S.name); }}>
+            <button className="btn btn-success button col-sm-5 py-2" onClick={ () => { accept(S.name); } }>
               Accept
-            </button>{" "}
+            </button>{ " " }
             &nbsp; &nbsp;
-            <button class="btn button btn-danger col-sm-5 py-2" onClick={() => { decline(myUsername.userUserName, S.name); }}>
+            <button className="btn button btn-danger col-sm-5 py-2" onClick={ () => { decline(myUsername.userUserName, S.name); } }>
               Decline
             </button>
           </div>
@@ -262,9 +260,9 @@ export default function ChatPage(props) {
             return status;
           });
           setfriendlist(friends);
-          setloadingFriendlist(true)
+          setloadingFriendlist(true);
         }
-      } else { setloadingFriendlist(false) }
+      } else { setloadingFriendlist(false); }
     });
     // }, 2000);
   }, [friendlist.length]);
@@ -385,7 +383,7 @@ export default function ChatPage(props) {
   }
 
   function setIconEvents() {
-    document.querySelector(".profilebtn").addEventListener("click", function (e) {
+    document.querySelector(".profilebtn")?.addEventListener("click", function (e) {
       document.querySelectorAll(".App-header span.btn").forEach((ele) => ele.classList.remove("active"));
       e.currentTarget.classList.add("active");
       document.querySelector(".startList").style.display = "none";
@@ -393,7 +391,7 @@ export default function ChatPage(props) {
       document.querySelector(".profileTab").style.display = "";
     });
 
-    document.querySelector(".addFrined").addEventListener("click", function (e) {
+    document.querySelector(".addFrined")?.addEventListener("click", function (e) {
       document.querySelectorAll(".App-header span.btn").forEach((ele) => ele.classList.remove("active"));
       e.currentTarget.classList.add("active");
       document.querySelector(".startList").style.display = "none";
@@ -401,90 +399,90 @@ export default function ChatPage(props) {
       document.querySelector(".addfriends").style.display = "";
     });
 
-    document.querySelector(".peopleList").addEventListener("click", function (e) {
-      document.querySelectorAll(".App-header span.btn").forEach((ele) => ele.classList.remove("active"));
+    document.querySelector(".peopleList")?.addEventListener("click", function (e) {
+      document.querySelectorAll(".App-header span.btn")?.forEach((ele) => ele.classList.remove("active"));
       e.currentTarget.classList.add("active");
       document.querySelector(".profileTab").style.display = "none";
       document.querySelector(".addfriends").style.display = "none";
       document.querySelector(".startList").style.display = "";
     });
 
-    document.querySelector(".App-header > h3.p-1").addEventListener("click", function () {
-      document.querySelector(".startScreen").classList.remove('d-none')
-      document.querySelector("div.chat").classList.add('d-none')
-      document.querySelector('.peopleList.btn ').dispatchEvent(new Event('click'))
-    })
+    document.querySelector(".App-header > h3.p-1")?.addEventListener("click", function () {
+      document.querySelector(".startScreen").classList.remove('d-none');
+      document.querySelector("div.chat").classList.add('d-none');
+      document.querySelector('.peopleList.btn ').dispatchEvent(new Event('click'));
+    });
 
     document.querySelectorAll(".App-header span.btn ").forEach((elem) => {
       elem.addEventListener("mouseenter", function (e) {
-        document.querySelector(".App-header div.flex-grow1 ").textContent = elem.getAttribute("name")
+        document.querySelector(".App-header div.flex-grow1 ").textContent = elem.getAttribute("name");
       });
       elem.addEventListener("mouseleave", function (e) {
-        document.querySelector(".App-header div.flex-grow1 ").textContent = ''
+        document.querySelector(".App-header div.flex-grow1 ").textContent = '';
       });
     });
 
     document.querySelectorAll('.chat-list li.clearfix').forEach((ele) => {
       ele.addEventListener('click', function (e) {
-        document.querySelectorAll('.chat-list li.clearfix').forEach((elem) => elem.classList.remove('active'))
-        e.target.classList.add('active')
-        document.querySelector('.startScreen').classList.add("d-none")
-        document.querySelector('div.chat').classList.remove("d-none")
-        document.querySelector("div.chat-history > ul") && (document.querySelector("div.chat-history > ul").scrollTop = document.querySelector("div.chat-history > ul").scrollHeight)
-      })
-    })
+        document.querySelectorAll('.chat-list li.clearfix').forEach((elem) => elem.classList.remove('active'));
+        e.target.classList.add('active');
+        document.querySelector('.startScreen').classList.add("d-none");
+        document.querySelector('div.chat').classList.remove("d-none");
+        document.querySelector("div.chat-history > ul") && (document.querySelector("div.chat-history > ul").scrollTop = document.querySelector("div.chat-history > ul").scrollHeight);
+      });
+    });
   }
 
   return (
-    <div class="container-fluid">
-      <div class="row clearfix">
-        <div class="col-lg-12">
-          <div class="card chat-app h-100">
-            {/* leftbar */}
+    <div className="container-fluid">
+      <div className="row clearfix">
+        <div className="col-lg-12">
+          <div className="card chat-app h-100">
+            {/* leftbar */ }
             <div className="people-list" id="plist">
-              {/* data-aos="flip-left" data-aos-once='true' data-aos-duration="300" */}
+              {/* data-aos="flip-left" data-aos-once='true' data-aos-duration="300" */ }
               <div className="startList">
-                {/* <div class="input-group"><div class="input-group-prepend"><input type="text" class="form-control" placeholder="Search..." />
-                    <span class="input-group-text btn btn-light rounded"><i class="fa fa-search"></i></span></div></div> */}
-                <ul class="list-unstyled chat-list mt-2 mb-0">
-                  {loadingFriendlist === undefined && <Loading />}
-                  {friendlist.length > 0 ? friendlist.map((e, i) => {
-                    return <li class="clearfix" dataName={e.name} onClick={() => { openChat(e.name) }}>
-                      <img src={userImage ? `${process.env.REACT_APP_API_URL + '/' + userImage}` : `defaultProfile.jpg`}
-                        alt="avatar" style={{ aspectRatio: "1 / 1" }} />
-                      <div class="about">
-                        <div class="name text-dark">{e.name}</div>
-                        {/* <div class="status"> <i class="fa fa-circle offline"></i> {e.status} </div> */}
+                {/* <div className="input-group"><div className="input-group-prepend"><input type="text" className="form-control" placeholder="Search..." />
+                    <span className="input-group-text btn btn-light rounded"><i className="fa fa-search"></i></span></div></div> */}
+                <ul className="list-unstyled chat-list mt-2 mb-0">
+                  { loadingFriendlist === undefined && <Loading /> }
+                  { friendlist.length > 0 ? friendlist.map((e, i) => {
+                    return <li className="clearfix" dataName={ e.name } onClick={ () => { openChat(e.name); } }>
+                      <img src={ userImage ? `${process.env.REACT_APP_API_URL + '/' + userImage}` : `defaultProfile.jpg` }
+                        alt="avatar" style={ { aspectRatio: "1 / 1" } } />
+                      <div className="about">
+                        <div className="name text-dark">{ e.name }</div>
+                        {/* <div className="status"> <i className="fa fa-circle offline"></i> {e.status} </div> */ }
                       </div>
-                    </li>
+                    </li>;
                   }) : <li className="clearfix"><div className="text-center name">
-                    Your friend list is empty, start chatting to friends by sending them friend requests.</div></li>}
+                    Your friend list is empty, start chatting to friends by sending them friend requests.</div></li> }
                 </ul>
               </div>
-              <div className="profileTab" style={{ display: "none", overflowY: "auto", height: '85vh', overflowX: "hidden" }}>
-                <div className="tab-pane active show px-1" id="settings" style={{ marginTop: '-6px' }}>
+              <div className="profileTab" style={ { display: "none", overflowY: "auto", height: '85vh', overflowX: "hidden" } }>
+                <div className="tab-pane active show px-1" id="settings" style={ { marginTop: '-6px' } }>
                   <div className="profile">
                     <h2 className="w-100 text-secondary text-right"><u> -Profile</u></h2>
                     <div className="text-center w-100 d-flex justify-content-center align-items-center" >
-                      <img className="avatar-xl" alt="avatar" style={{ height: "140px", width: '140px' }}
-                        src={userImage ? `${process.env.REACT_APP_API_URL + '/' + userImage}` : 'defaultProfile.jpg'} />
+                      <img className="avatar-xl" alt="avatar" style={ { height: "140px", width: '140px' } }
+                        src={ userImage ? `${process.env.REACT_APP_API_URL + '/' + userImage}` : 'defaultProfile.jpg' } />
                     </div>
-                    <h2 className="text-center text-dark">{userName}</h2>
-                    <h5 className="text-center text-dark">{userUserName}</h5>
+                    <h2 className="text-center text-dark">{ userName }</h2>
+                    <h5 className="text-center text-dark">{ userUserName }</h5>
                   </div>
                   <h2 className="w-100 text-secondary text-right"><u> -Settings</u></h2>
-                  <details className="text-primary" style={{ marginTop: "2rem", fontSize: "1.2rem", fontWeight: "bold" }}>
-                    <summary style={{ fontSize: ".9em" }}>Update your profile details</summary>
+                  <details className="text-primary" style={ { marginTop: "2rem", fontSize: "1.2rem", fontWeight: "bold" } }>
+                    <summary style={ { fontSize: ".9em" } }>Update your profile details</summary>
                     <form>
                       <div className="upload">
                         <img className="avatar-xl mt-2" height='55px' width='55px' alt="image"
-                          src={userImage ? `${process.env.REACT_APP_API_URL + '/' + userImage}` : 'defaultProfile.jpg'} />
+                          src={ userImage ? `${process.env.REACT_APP_API_URL + '/' + userImage}` : 'defaultProfile.jpg' } />
                         <div className="column">
-                          <input type="file" accept="image/png,image/jpg,image/jpeg" className="rounded btn btn-light w-75 ml-1" onChange={(e) => { setProfile(e) }}
-                            style={{ overflow: "hidden" }} />
-                          {/* <span className="btn btn-primary w-50 m-1 bg-primary" >Upload</span> */}
+                          <input type="file" accept="image/png,image/jpg,image/jpeg" className="rounded btn btn-light w-75 ml-1" onChange={ (e) => { setProfile(e); } }
+                            style={ { overflow: "hidden" } } />
+                          {/* <span className="btn btn-primary w-50 m-1 bg-primary" >Upload</span> */ }
                           <div className="text-center">
-                            <button type="button" onClick={updateProfile} className="btn bg-success btn-success w-50 ">Set</button>
+                            <button type="button" onClick={ updateProfile } className="btn bg-success btn-success w-50 ">Set</button>
                           </div>
                         </div>
                         <small className="text-secondary">For best results, use an image at least 256px by 256px in either .jpg or .png format!</small>
@@ -492,102 +490,102 @@ export default function ChatPage(props) {
                       <div className="parent">
                         <div className="field">
                           <label htmlFor="Name">Name </label>
-                          <input type="text" className="form-control" placeholder="Name" name="Uname" value={uname} onChange={(e) => { setValue(e) }} required />
+                          <input type="text" className="form-control" placeholder="Name" name="Uname" value={ uname } onChange={ (e) => { setValue(e); } } required />
                         </div>
                         <div className="field">
                           <label htmlFor="username">Username </label>
-                          <input type="text" name="Uusername" className="form-control" id="username" placeholder="Username" value={uusername} onChange={(e) => { setValue(e) }} />
+                          <input type="text" name="Uusername" className="form-control" id="username" placeholder="Username" value={ uusername } onChange={ (e) => { setValue(e); } } />
                         </div>
                       </div>
                       <div className="field">
                         <label htmlFor="email">Email </label>
-                        <input type="email" name="Uemail" className="form-control" id="email" placeholder="Enter your email address" required disabled value={uemail} onChange={(e) => { setValue(e) }} />
+                        <input type="email" name="Uemail" className="form-control" id="email" placeholder="Enter your email address" required disabled value={ uemail } onChange={ (e) => { setValue(e); } } />
                       </div>
-                      <button type="button" className="btn button w-100 mt-2" onClick={(e) => { dispatch(updateDetails({ uname, uusername }, user)) }} >Apply Changes</button>
+                      <button type="button" className="btn button w-100 mt-2" onClick={ (e) => { dispatch(updateDetails({ uname, uusername }, user)); } } >Apply Changes</button>
                     </form>
                   </details>
-                  <details className="text-primary" style={{ marginTop: "2rem", fontSize: "1.2rem", fontWeight: "bold" }}>
-                    <summary style={{ fontSize: ".9em" }}>Change Password</summary>
+                  <details className="text-primary" style={ { marginTop: "2rem", fontSize: "1.2rem", fontWeight: "bold" } }>
+                    <summary style={ { fontSize: ".9em" } }>Change Password</summary>
                     <form>
                       <div className="field">
                         <label htmlFor="password">Old Password</label>
                         <input type="password" name="oldpassword" className="form-control" id="password"
-                          placeholder="Enter current password" required value={oldpassword} onChange={(e) => { setValue(e) }} />
+                          placeholder="Enter current password" required value={ oldpassword } onChange={ (e) => { setValue(e); } } />
                       </div>
                       <div className="field">
                         <label htmlFor="password">New Password</label>
                         <input type="password" name="newpassword" className="form-control" id="password"
-                          placeholder="Enter new password" required value={newpassword} onChange={(e) => { setValue(e) }} />
+                          placeholder="Enter new password" required value={ newpassword } onChange={ (e) => { setValue(e); } } />
                       </div>
                       <div className="field">
                         <label htmlFor="password">Re-enter New Password</label>
                         <input type="password" name="re-enter-new-password" className="form-control" id="password"
-                          placeholder="Enter again new password" required value={reenternewpassword} onChange={(e) => { setValue(e) }} />
+                          placeholder="Enter again new password" required value={ reenternewpassword } onChange={ (e) => { setValue(e); } } />
                       </div>
-                      <button type="button" className="btn button w-100 mt-2" onClick={changePassword}>Change Password</button>
+                      <button type="button" className="btn button w-100 mt-2" onClick={ changePassword }>Change Password</button>
                     </form>
                   </details>
                 </div>
               </div>
-              <div className="addfriends tab-pane fade" style={{ display: "none", opacity: 1 }}>
+              <div className="addfriends tab-pane fade" style={ { display: "none", opacity: 1 } }>
                 <div className="search">
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <input name="friend" value={friend} onChange={(e) => { setValue(e); }} type="text" className="form-control" required id="user notice" placeholder="Username to add friends..." />
-                      <button className="btn rounded bg-light create" type="button" onClick={addFriend}><i className="fa fa-user-plus"></i></button>
+                  <div className="input-group">
+                    <div className="input-group-prepend">
+                      <input name="friend" value={ friend } onChange={ (e) => { setValue(e); } } type="text" className="form-control" required id="user notice" placeholder="Username to add friends..." />
+                      <button className="btn rounded bg-light create" type="button" onClick={ addFriend }><i className="fa fa-user-plus"></i></button>
                     </div>
                   </div>
                 </div>
                 <div className="notifications">
-                  <h2 class="my-3 text-dark">Friend requests</h2>
-                  {mainnotif.length != 0 && (
-                    <ul style={{ overflowY: 'auto' }} className="list-group" id="alerts" role="tablist">
-                      {mainnotif}
+                  <h2 className="my-3 text-dark">Friend requests</h2>
+                  { mainnotif.length != 0 && (
+                    <ul style={ { overflowY: 'auto' } } className="list-group" id="alerts" role="tablist">
+                      { mainnotif }
                     </ul>
-                  )}
-                  {mainnotif.length == 0 && (
-                    <div className="list-group m-auto" id="alerts" role="tablist" style={{
+                  ) }
+                  { mainnotif.length == 0 && (
+                    <div className="list-group m-auto" id="alerts" role="tablist" style={ {
                       fontFamily: "Seoge UI", fontSize: "20px", fontWeight: "400", display: "flex", justifyContent: "center",
                       flexDirection: "column", alignItems: "center"
-                    }}>
-                      <p style={{ textAlign: "center" }}>No one sends you a friend request :( </p>
+                    } }>
+                      <p style={ { textAlign: "center" } }>No one sends you a friend request :( </p>
                     </div>
-                  )}
+                  ) }
                 </div>
               </div>
-              {setIconEvents()}
+              { setIconEvents() }
             </div>
-            {/* End of leftbar */}
+            {/* End of leftbar */ }
 
-            <div className="startScreen" style={{ overflow: 'hidden', height: 'min-content' }}>
-              <img className="bg-secondary w-100" src='/robot.gif' alt="hey :-)" style={{ height: '93vh' }} />
+            <div className="startScreen" style={ { overflow: 'hidden', height: 'min-content' } }>
+              <img className="bg-secondary w-100" src='/robot.gif' alt="hey :-)" style={ { height: '93vh' } } />
             </div>
 
             <div div className="chat d-none">
-              <div class="chat-header clearfix">
-                <div class="row">
-                  <div class="col-lg-6">
+              <div className="chat-header clearfix">
+                <div className="row">
+                  <div className="col-lg-6">
                     <a href="javascript:void(0);" data-toggle="modal" data-target="#view_info">
-                      <img src={userImage ? `${process.env.REACT_APP_API_URL + '/' + userImage}` : "defaultProfile.jpg"} alt="avatar" />
+                      <img src={ userImage ? `${process.env.REACT_APP_API_URL + '/' + userImage}` : "defaultProfile.jpg" } alt="avatar" />
                     </a>
-                    <div class="chat-about">
-                      <h5 class="mb-0 text-dark">{chatName}</h5>
-                      <small>{chatUsername}</small>
+                    <div className="chat-about">
+                      <h5 className="mb-0 text-dark">{ chatName }</h5>
+                      <small>{ chatUsername }</small>
                     </div>
                   </div>
-                  <div class="col-lg-6 hidden-sm text-right">
+                  <div className="col-lg-6 hidden-sm text-right">
                     <div className="dropdown">
-                      <button class="btn btn-outline-warning" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        &nbsp;<i class="fa fa-ellipsis-v"></i>&nbsp;
+                      <button className="btn btn-outline-warning" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        &nbsp;<i className="fa fa-ellipsis-v"></i>&nbsp;
                       </button>
-                      <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
-                        <button onClick={() => { deleteHistory(myUsername.userUserName, chatUsername) }} className="dropdown-item">
+                      <div className="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+                        <button onClick={ () => { deleteHistory(myUsername.userUserName, chatUsername); } } className="dropdown-item">
                           <i className="fa fa-trash"></i>&nbsp;
                           Clear Chat History
                         </button>
-                        <button onClick={(e) => { unfriend(myUsername.userUserName, chatUsername, e) }} className="dropdown-item">
+                        <button onClick={ (e) => { unfriend(myUsername.userUserName, chatUsername, e); } } className="dropdown-item">
                           <i className="fas fa-user-slash"></i>&nbsp;
-                          Unfriend {chatUsername}
+                          Unfriend { chatUsername }
                         </button>
                       </div>
                     </div>
@@ -595,58 +593,58 @@ export default function ChatPage(props) {
                 </div>
               </div>
 
-              <div class="chat-history">
-                {console.log(sortedMergeMessages)}
-                {sortedMergeMessages.length != 0 && <><ul class="m-b-0">
-                  {(() => {
+              <div className="chat-history">
+                { console.log(sortedMergeMessages) }
+                { sortedMergeMessages.length != 0 && <><ul className="m-b-0">
+                  { (() => {
                     return sortedMergeMessages.map((s) => {
-                      return <li class="clearfix">
-                        <div className={s.friendUsername == myUsername.userUserName ? "message-data" : "message-data text-right"} style={{ minWidth: '64px' }}>
-                          {/* {console.log(`${process.env.REACT_APP_API_URL + '/' + chatProfile}`)} */}
-                          {s.friendUsername == myUsername.userUserName && <img src={chatProfile ? `${process.env.REACT_APP_API_URL + '/' + chatProfile}` : `defaultProfile.jpg`} alt="avatar" />}
-                          <span class="message-data-time">{s.time}&nbsp;{s.date}</span>
+                      return <li className="clearfix">
+                        <div className={ s.friendUsername == myUsername.userUserName ? "message-data" : "message-data text-right" } style={ { minWidth: '64px' } }>
+                          {/* {console.log(`${process.env.REACT_APP_API_URL + '/' + chatProfile}`)} */ }
+                          { s.friendUsername == myUsername.userUserName && <img src={ chatProfile ? `${process.env.REACT_APP_API_URL + '/' + chatProfile}` : `defaultProfile.jpg` } alt="avatar" /> }
+                          <span className="message-data-time">{ s.time }&nbsp;{ s.date }</span>
                         </div>
-                        <div class={s.friendUsername == myUsername.userUserName ? "message other-message" : "message my-message float-right"}>
-                          <div class="dropdown">
-                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                              <span class="dropdown-item" style={{ cursor: 'pointer' }} onClick={() => { deleteMsg(s.messageid) }}>
+                        <div className={ s.friendUsername == myUsername.userUserName ? "message other-message" : "message my-message float-right" }>
+                          <div className="dropdown">
+                            <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                              <span className="dropdown-item" style={ { cursor: 'pointer' } } onClick={ () => { deleteMsg(s.messageid); } }>
                                 <i className="fa fa-trash"></i> delete
                               </span>
                             </div>
-                            <span class="dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                              {s.message.split('\n').map(str => <p className={s.message.split('\n').length > 1 ? "" : 'd-inline'}>{str}</p>)}
+                            <span className="dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              { s.message.split('\n').map(str => <p className={ s.message.split('\n').length > 1 ? "" : 'd-inline' }>{ str }</p>) }
                             </span>
                           </div>
                         </div>
-                      </li>
-                    })
-                  })()}
+                      </li>;
+                    });
+                  })() }
                 </ul>
-                  <div ref={messagesEndRef}></div>
-                  <div className="picker-container" style={{ position: 'relative', width: '99%', bottom: '13em', left: '0.2em', overflowX: 'hidden' }}>
-                    {showPicker && <Picker pickerStyle={{ width: '100%', height: '30vh' }} onEmojiClick={onEmojiClick} />}
+                  <div ref={ messagesEndRef }></div>
+                  <div className="picker-container" style={ { position: 'relative', width: '99%', bottom: '13em', left: '0.2em', overflowX: 'hidden' } }>
+                    { showPicker && <Picker pickerStyle={ { width: '100%', height: '30vh' } } onEmojiClick={ onEmojiClick } /> }
                   </div>
-                </>}
-                {sortedMergeMessages.length == 0 && <div className="col-md-12">
+                </> }
+                { sortedMergeMessages.length == 0 && <div className="col-md-12">
                   <div className="no-messages">
-                    {/* <i className="material-icons md-48">forum</i> */}
+                    {/* <i className="material-icons md-48">forum</i> */ }
                     <p className="text-center">Seems people are shy to start the chat. Break the ice send the first message.</p>
                   </div>
-                  <div className="picker-container" style={{ position: 'relative', width: '100%' }}>
-                    {showPicker && <Picker pickerStyle={{ width: '100%', height: '30vh' }} onEmojiClick={onEmojiClick} />}
+                  <div className="picker-container" style={ { position: 'relative', width: '100%' } }>
+                    { showPicker && <Picker pickerStyle={ { width: '100%', height: '30vh' } } onEmojiClick={ onEmojiClick } /> }
                   </div>
-                </div>}
+                </div> }
               </div>
 
-              <div class="chat-message clearfix">
-                <div class="input-group mb-0 bg-light">
-                  <div class="input-group-prepend border w-100 rounded">
-                    <div class="input-group-text btn btn-warning emoticons" onClick={() => setShowPicker(val => !val)}>
-                      <i class="fa fa-smile"></i>
+              <div className="chat-message clearfix">
+                <div className="input-group mb-0 bg-light">
+                  <div className="input-group-prepend border w-100 rounded">
+                    <div className="input-group-text btn btn-warning emoticons" onClick={ () => setShowPicker(val => !val) }>
+                      <i className="fa fa-smile"></i>
                     </div>
-                    <textarea style={{ resize: 'none' }} name="message" value={message} onChange={(e) => { setValue(e); }} class="form-control m-0 p-3" placeholder="Type messages here..." rows={1} defaultValue={""} />
-                    <span onClick={() => { sendMessage(chatUsername) }} class="input-group-text btn btn-success send">
-                      <i class="fa fa-paper-plane"></i>
+                    <textarea style={ { resize: 'none' } } name="message" value={ message } onChange={ (e) => { setValue(e); } } className="form-control m-0 p-3" placeholder="Type messages here..." rows={ 1 } defaultValue={ "" } />
+                    <span onClick={ () => { sendMessage(chatUsername); } } className="input-group-text btn btn-success send">
+                      <i className="fa fa-paper-plane"></i>
                     </span>
                   </div>
                 </div>

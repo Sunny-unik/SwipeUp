@@ -3,6 +3,7 @@ import { NavLink, Route, Routes, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Login from "./Login";
 import "./css/loginSignup.css";
+import RegexHelper from "../helpers/RegexHelper";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -23,44 +24,19 @@ export default function Signup() {
   }
 
   function validate() {
-    var isvalid = true;
+    const errors = [];
 
-    //*validate for Name
-    if (uname === "" || uname === null) {
-      isvalid = false;
-      alert("please enter name");
-      return false;
-    }
-    //*validate for email
-    let emailregex =
-      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    if (!emailregex.test(uemail)) {
-      alert("Email is not valid");
-      isvalid = false;
-      return false;
-    }
-    //*validate for username
-    if (uusername === "" || uusername === null || uusername == " ") {
-      isvalid = false;
-      alert("please enter username");
-      return false;
-    }
-    // let userregex = /^[a-z0-9_\.]+$/;
-    // if (!userregex.test(uusername)) {
-    // 	alert("Usernames can only have: Lowercase Letters (a-z), Numbers (0-9), Dots (.), Underscores (_)");
-    // 	isvalid = false;
-    // }
-    //*validate for password
-    let passregex =
-      /(?=(.*[0-9]))(?=.*[\!@#$%^&*()\\[\]{}\-_+=~`|:;"'<>,./?])(?=.*[a-z])(?=(.*[A-Z]))(?=(.*)).{8,}/;
-    if (!passregex.test(upassword)) {
-      alert(
+    if (uname === "" || uname === null) errors.push("Please enter valid name");
+    if (!RegexHelper("email").test(uemail)) errors.push("Email is not valid");
+    if (uusername.trim() === "" || uusername === null)
+      errors.push("Please enter valid username");
+    if (!RegexHelper("password").test(upassword))
+      errors.push(
         "Password should have 1 lowercase letter, 1 uppercase letter, 1 number, 1 special character and be at least 8 characters long"
       );
-      isvalid = false;
-      return false;
-    }
-    if (isvalid === true) {
+
+    if (errors.length) alert(errors.join(", \n"));
+    else
       axios
         .post(`${process.env.REACT_APP_API_URL}/valid-username`, { uusername })
         .then((res) => {
@@ -93,8 +69,8 @@ export default function Signup() {
             alert("This username already taken :(");
             return false;
           }
-        });
-    }
+        })
+        .catch((err) => console.log(err));
   }
 
   function otpcheck() {
@@ -200,7 +176,11 @@ export default function Signup() {
                     <div className="callout">
                       <span id="createact">
                         Already have an account?
-                        <NavLink exact to="/" className="btn btn-primary w-100">
+                        <NavLink
+                          exact="true"
+                          to="/"
+                          className="btn btn-primary w-100"
+                        >
                           Sign in
                         </NavLink>
                       </span>
@@ -259,7 +239,7 @@ export default function Signup() {
                   To keep connected with your friends please login with your
                   personal info.
                 </p>
-                <NavLink exact to="/">
+                <NavLink exact="true" to="/">
                   <button className="btn button" type="button">
                     Sign in
                   </button>
@@ -272,7 +252,7 @@ export default function Signup() {
         {/* <!-- End of Sidebar --> */}
       </div>
       <Routes>
-        <Route path="/" exact component={Login} />
+        <Route path="/" exact="true" component={Login} />
       </Routes>
       {/* <!-- Layout --> */}
     </main>

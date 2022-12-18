@@ -59,7 +59,7 @@ export default function MainNav(props) {
               className="text-white font-weight-bold m-auto"
               onClick={logout}
               style={{ textDecoration: "none" }}
-              to="/"
+              to="/login"
             >
               <span className="btn btn-outline-danger" name="Logout">
                 <i className="fa fa-sign-out" aria-hidden="true"></i>
@@ -68,9 +68,9 @@ export default function MainNav(props) {
           </div>
         )}
         <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/createAccount" element={<Signup />} />
-          <Route path="/chats" element={<ChatPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/" element={<ChatPage />} />
         </Routes>
       </Router>
     </div>

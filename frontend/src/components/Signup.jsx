@@ -80,7 +80,7 @@ export default function Signup() {
         .post(`${process.env.REACT_APP_API_URL}/create-account`, s)
         .then((res) => {
           if (res.data.status === "OK") {
-            navigate("/");
+            navigate("/login");
           }
         });
     } else {
@@ -178,7 +178,7 @@ export default function Signup() {
                         Already have an account?
                         <NavLink
                           exact="true"
-                          to="/"
+                          to="/login"
                           className="btn btn-primary w-100"
                         >
                           Sign in
@@ -239,7 +239,7 @@ export default function Signup() {
                   To keep connected with your friends please login with your
                   personal info.
                 </p>
-                <NavLink exact="true" to="/">
+                <NavLink exact="true" to="/login">
                   <button className="btn button" type="button">
                     Sign in
                   </button>

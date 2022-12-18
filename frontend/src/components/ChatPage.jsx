@@ -17,7 +17,7 @@ export default function ChatPage() {
   useEffect(() => {
     if (!user) {
       const localToken = localStorage.getItem("token");
-      !localToken ? navigate("/") : dispatch(validateUser(localToken));
+      !localToken ? navigate("/login") : dispatch(validateUser(localToken));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);

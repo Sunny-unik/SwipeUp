@@ -22,7 +22,7 @@ export default function Login() {
   useEffect(() => {
     const localToken = localStorage.getItem("token");
     if (reduxUser) {
-      navigate("/chats");
+      navigate("/");
     } else if (!!localToken) {
       dispatch(validateUser(localToken));
     }
@@ -171,7 +171,7 @@ export default function Login() {
                     <div className="callout">
                       <span>
                         Don't have account?{" "}
-                        <NavLink to="/createAccount" className="text-primary">
+                        <NavLink to="/signup" className="text-primary">
                           Create Account
                         </NavLink>
                       </span>
@@ -284,7 +284,7 @@ export default function Login() {
                   Enter your personal details and start your journey with
                   SwipeUp today.
                 </p>
-                <NavLink className="btn button" to="/createAccount">
+                <NavLink className="btn button" to="/signup">
                   Sign up
                 </NavLink>
               </div>
